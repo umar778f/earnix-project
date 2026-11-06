@@ -46,3 +46,4 @@ export const BENCHMARK_RATES_TO_USD: Record<SupportedCurrency, number> = {
   GBP: 0.7825, // 1 USD = 0.7825 GBP (or 1 GBP = 1.278 USD)
   PKR: 278.50, // 1 USD = 278.50 PKR (SBP benchmark)
 }
+
