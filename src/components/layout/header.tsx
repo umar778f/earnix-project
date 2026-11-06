@@ -2,11 +2,12 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Bell, LogIn } from "lucide-react"
+import { LogIn } from "lucide-react"
 import { MobileNav } from "@/components/layout/mobile-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { CurrencySwitcher } from "@/components/currency/currency-switcher"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { NotificationsFlyout } from "@/components/notifications/notifications-flyout"
+import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { MAIN_NAV_ITEMS, FOOTER_NAV_ITEMS } from "@/config/navigation"
 
@@ -54,17 +55,8 @@ export function Header({ userEmail, userName, baseCurrency = "USD" }: HeaderProp
         {/* Base Display Currency Switcher */}
         <CurrencySwitcher currentCurrency={baseCurrency} />
 
-        {/* Notification placeholder button */}
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          className="relative text-muted-foreground hover:text-foreground cursor-pointer"
-          aria-label="Notifications (Phase 14)"
-          title="Notifications (Phase 14)"
-        >
-          <Bell className="size-4" />
-          <span className="absolute top-1 right-1 size-1.5 rounded-full bg-emerald-500 ring-2 ring-background" />
-        </Button>
+        {/* Notifications Hub Flyout */}
+        <NotificationsFlyout />
 
         {/* Light/Dark Theme toggle */}
         <ThemeToggle />

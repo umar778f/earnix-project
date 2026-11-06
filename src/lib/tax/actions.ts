@@ -71,3 +71,4 @@ export async function updateTaxConfigAction(input: TaxConfigInput): Promise<TaxA
   revalidatePath("/tax")
   return { success: true }
 }
+
