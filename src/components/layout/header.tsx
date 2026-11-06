@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { Bell, LogIn } from "lucide-react"
 import { MobileNav } from "@/components/layout/mobile-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { CurrencySwitcher } from "@/components/currency/currency-switcher"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { MAIN_NAV_ITEMS, FOOTER_NAV_ITEMS } from "@/config/navigation"
@@ -12,9 +13,10 @@ import { MAIN_NAV_ITEMS, FOOTER_NAV_ITEMS } from "@/config/navigation"
 interface HeaderProps {
   userEmail?: string | null
   userName?: string | null
+  baseCurrency?: string
 }
 
-export function Header({ userEmail, userName }: HeaderProps) {
+export function Header({ userEmail, userName, baseCurrency = "USD" }: HeaderProps) {
   const pathname = usePathname()
 
   // Find current active item title
@@ -48,7 +50,10 @@ export function Header({ userEmail, userName }: HeaderProps) {
       </div>
 
       {/* Right Action Tools */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Base Display Currency Switcher */}
+        <CurrencySwitcher currentCurrency={baseCurrency} />
+
         {/* Notification placeholder button */}
         <Button
           variant="ghost"
