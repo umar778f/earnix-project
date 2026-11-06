@@ -1,10 +1,12 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { type TransactionRecordItem } from "@/lib/transactions/service"
 import { formatMoney, toDecimal, addDecimals } from "@/lib/currency/format"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 import { ManualEntryDialog } from "@/components/transactions/manual-entry-dialog"
 import { TransactionDetailSheet } from "@/components/transactions/transaction-detail-sheet"
 import { deleteTransactionAction } from "@/lib/transactions/actions"
@@ -21,6 +23,7 @@ import {
   AlertTriangle,
   Loader2,
   DollarSign,
+  FileSpreadsheet,
 } from "lucide-react"
 
 interface TransactionTableViewProps {
@@ -234,10 +237,19 @@ export function TransactionTableView({
           </select>
         </div>
 
-        <Button onClick={handleOpenAdd} size="sm" className="gap-1.5 cursor-pointer text-xs">
-          <Plus className="size-4" />
-          <span>Record Payment</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/transactions/import"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-1.5 cursor-pointer text-xs")}
+          >
+            <FileSpreadsheet className="size-3.5" />
+            <span>Import Statement</span>
+          </Link>
+          <Button onClick={handleOpenAdd} size="sm" className="gap-1.5 cursor-pointer text-xs">
+            <Plus className="size-4" />
+            <span>Record Payment</span>
+          </Button>
+        </div>
       </div>
 
       {/* Action Error Alert */}

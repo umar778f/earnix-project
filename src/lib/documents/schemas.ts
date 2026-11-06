@@ -32,3 +32,4 @@ export const documentUploadSchema = z.object({
 })
 
 export type DocumentUploadInput = z.infer<typeof documentUploadSchema>
+

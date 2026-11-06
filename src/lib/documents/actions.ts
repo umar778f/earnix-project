@@ -175,3 +175,4 @@ export async function deleteDocumentAction(documentId: string): Promise<Document
   revalidatePath("/documents")
   return { success: true }
 }
+

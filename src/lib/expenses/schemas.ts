@@ -44,3 +44,4 @@ export const expenseFormSchema = z.object({
 })
 
 export type ExpenseFormData = z.infer<typeof expenseFormSchema>
+
