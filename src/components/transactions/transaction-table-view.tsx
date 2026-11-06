@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { ManualEntryDialog } from "@/components/transactions/manual-entry-dialog"
 import { TransactionDetailSheet } from "@/components/transactions/transaction-detail-sheet"
 import { deleteTransactionAction } from "@/lib/transactions/actions"
+import { AiReviewBanner } from "@/components/ai/ai-review-banner"
 import {
   Search,
   Plus,
@@ -24,6 +25,7 @@ import {
   Loader2,
   DollarSign,
   FileSpreadsheet,
+  Sparkles,
 } from "lucide-react"
 
 interface TransactionTableViewProps {
@@ -58,6 +60,10 @@ export function TransactionTableView({
   // Deletion state
   const [deletePendingId, setDeletePendingId] = React.useState<string | null>(null)
   const [actionError, setActionError] = React.useState<string | null>(null)
+
+  // AI Categorization counts
+  const pendingAiCount = initialTransactions.filter((t) => t.aiReviewStatus === "pending_review").length
+  const unassignedAiCount = initialTransactions.filter((t) => !t.aiReviewStatus || t.aiReviewStatus === "unassigned").length
 
   // Filter computation
   const filteredTransactions = initialTransactions.filter((tx) => {
@@ -187,6 +193,13 @@ export function TransactionTableView({
           </div>
         </div>
       </div>
+
+      {/* AI Categorization Review Banner */}
+      <AiReviewBanner
+        type="transaction"
+        pendingCount={pendingAiCount}
+        unassignedCount={unassignedAiCount}
+      />
 
       {/* Filter and Action Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -324,15 +337,44 @@ export function TransactionTableView({
                       </td>
 
                       <td className="px-4 py-3.5 max-w-[260px]">
-                        <div className="space-y-0.5">
+                        <div className="space-y-1">
                           <p className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                             {tx.description}
                           </p>
-                          {tx.referenceId && (
-                            <p className="text-[10px] font-mono text-muted-foreground/80 truncate">
-                              Ref: {tx.referenceId}
-                            </p>
-                          )}
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {tx.aiReviewStatus === "pending_review" ? (
+                              <span
+                                className="inline-flex items-center gap-1 rounded bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 px-1.5 py-0 text-[10px] font-medium"
+                                title="AI Proposed Category - Awaiting User Confirmation"
+                              >
+                                <Sparkles className="size-2.5 text-amber-600" />
+                                <span>{tx.category}</span>
+                                {tx.aiConfidence && (
+                                  <span className="opacity-75 font-mono">
+                                    ({Math.round(tx.aiConfidence * 100)}%)
+                                  </span>
+                                )}
+                              </span>
+                            ) : tx.aiReviewStatus === "confirmed" ? (
+                              <span
+                                className="inline-flex items-center gap-1 rounded bg-secondary px-1.5 py-0 text-[10px] font-medium text-secondary-foreground"
+                                title="Confirmed Category"
+                              >
+                                <CheckCircle2 className="size-2.5 text-emerald-600" />
+                                <span>{tx.category}</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center rounded bg-muted/80 px-1.5 py-0 text-[10px] font-medium text-muted-foreground">
+                                {tx.category}
+                              </span>
+                            )}
+
+                            {tx.referenceId && (
+                              <span className="text-[10px] font-mono text-muted-foreground/80 truncate">
+                                &bull; {tx.referenceId}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
 

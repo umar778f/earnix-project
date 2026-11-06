@@ -10,6 +10,7 @@ import { formatMoney } from "@/lib/currency/format"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { AiReviewBanner } from "@/components/ai/ai-review-banner"
 import {
   Search,
   Plus,
@@ -22,6 +23,7 @@ import {
   Trash2,
   Pencil,
   Info,
+  Sparkles,
 } from "lucide-react"
 
 interface ExpenseTableViewProps {
@@ -41,6 +43,10 @@ export function ExpenseTableView({ summary, receiptOptions }: ExpenseTableViewPr
   // Delete transition
   const [isDeleting, startDeleteTransition] = useTransition()
   const [deletingId, setDeletingId] = React.useState<string | null>(null)
+
+  // AI Categorization counts
+  const pendingAiCount = summary.expenses.filter((e) => e.aiReviewStatus === "pending_review").length
+  const unassignedAiCount = summary.expenses.filter((e) => e.aiReviewStatus === "unassigned").length
 
   const handleOpenCreate = () => {
     setExpenseToEdit(null)
@@ -161,6 +167,13 @@ export function ExpenseTableView({ summary, receiptOptions }: ExpenseTableViewPr
         </div>
       </div>
 
+      {/* AI Categorization Review Banner */}
+      <AiReviewBanner
+        type="expense"
+        pendingCount={pendingAiCount}
+        unassignedCount={unassignedAiCount}
+      />
+
       {/* Control Strip: Search, Filters & Action */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="flex flex-1 items-center gap-2 max-w-md">
@@ -252,9 +265,27 @@ export function ExpenseTableView({ summary, receiptOptions }: ExpenseTableViewPr
 
                     {/* Category */}
                     <td className="py-3 px-3.5 whitespace-nowrap">
-                      <span className="inline-flex items-center rounded-md bg-secondary/80 px-2 py-0.5 text-[11px] font-medium text-secondary-foreground">
-                        {exp.category}
-                      </span>
+                      {exp.aiReviewStatus === "pending_review" ? (
+                        <span
+                          className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 px-2 py-0.5 text-[11px] font-medium"
+                          title="AI Proposed Category - Pending Confirmation"
+                        >
+                          <Sparkles className="size-2.5 text-amber-600" />
+                          <span>{exp.category}</span>
+                        </span>
+                      ) : exp.aiReviewStatus === "confirmed" ? (
+                        <span
+                          className="inline-flex items-center gap-1 rounded-md bg-secondary/80 px-2 py-0.5 text-[11px] font-medium text-secondary-foreground"
+                          title="Confirmed Category"
+                        >
+                          <CheckCircle2 className="size-2.5 text-emerald-600" />
+                          <span>{exp.category}</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-md bg-secondary/80 px-2 py-0.5 text-[11px] font-medium text-secondary-foreground">
+                          {exp.category}
+                        </span>
+                      )}
                     </td>
 
                     {/* Paid Original Amount */}

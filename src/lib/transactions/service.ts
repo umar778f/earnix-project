@@ -22,6 +22,8 @@ export interface TransactionRecordItem {
   status: TransactionStatus
   sourceType: SourceType
   category: string
+  aiReviewStatus?: "unassigned" | "pending_review" | "confirmed" | "rejected"
+  aiConfidence?: number | null
   metadata: Record<string, unknown>
   createdAt: string
   isDemo?: boolean
@@ -58,7 +60,9 @@ export const DEMO_TRANSACTIONS_LIST: TransactionRecordItem[] = [
     description: "Milestone 3: Next.js SaaS Architecture & API Implementation",
     status: "completed",
     sourceType: "demo",
-    category: "Freelance Income",
+    category: "Software Development",
+    aiReviewStatus: "pending_review",
+    aiConfidence: 0.94,
     metadata: { contractType: "Fixed Price", feeAmount: 180.0 },
     createdAt: "2026-11-02T14:30:00Z",
     isDemo: true,
@@ -330,6 +334,8 @@ export async function getTransactionsData(options?: { preferDemo?: boolean }): P
         status,
         source_type,
         category,
+        ai_review_status,
+        ai_confidence,
         metadata,
         created_at,
         client:clients(id, name),
@@ -389,6 +395,8 @@ export async function getTransactionsData(options?: { preferDemo?: boolean }): P
         status: tx.status,
         sourceType: tx.source_type,
         category: tx.category,
+        aiReviewStatus: (tx.ai_review_status as TransactionRecordItem["aiReviewStatus"]) || "unassigned",
+        aiConfidence: tx.ai_confidence ? Number(tx.ai_confidence) : null,
         metadata: (tx.metadata as Record<string, unknown>) || {},
         createdAt: tx.created_at,
         isDemo: false,
