@@ -7,6 +7,7 @@ import { MobileNav } from "@/components/layout/mobile-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { CurrencySwitcher } from "@/components/currency/currency-switcher"
 import { NotificationsFlyout } from "@/components/notifications/notifications-flyout"
+import { type NotificationItem } from "@/lib/notifications/types"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { MAIN_NAV_ITEMS, FOOTER_NAV_ITEMS } from "@/config/navigation"
@@ -15,9 +16,15 @@ interface HeaderProps {
   userEmail?: string | null
   userName?: string | null
   baseCurrency?: string
+  notifications?: NotificationItem[]
 }
 
-export function Header({ userEmail, userName, baseCurrency = "USD" }: HeaderProps) {
+export function Header({
+  userEmail,
+  userName,
+  baseCurrency = "USD",
+  notifications,
+}: HeaderProps) {
   const pathname = usePathname()
 
   // Find current active item title
@@ -56,7 +63,7 @@ export function Header({ userEmail, userName, baseCurrency = "USD" }: HeaderProp
         <CurrencySwitcher currentCurrency={baseCurrency} />
 
         {/* Notifications Hub Flyout */}
-        <NotificationsFlyout />
+        <NotificationsFlyout initialNotifications={notifications} />
 
         {/* Light/Dark Theme toggle */}
         <ThemeToggle />

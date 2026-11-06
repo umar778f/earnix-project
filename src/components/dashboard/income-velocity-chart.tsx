@@ -21,15 +21,26 @@ interface IncomeVelocityChartProps {
 
 const emptySubscribe = () => () => {}
 
+interface CustomTooltipPayloadItem {
+  name?: string
+  value?: number
+  color?: string
+}
+
+interface CustomTooltipProps {
+  active?: boolean
+  payload?: CustomTooltipPayloadItem[]
+  label?: string
+  baseCurrency?: string
+}
+
 // Custom tooltip for financial precision and styling
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function CustomTooltip({ active, payload, label, baseCurrency }: any) {
+function CustomTooltip({ active, payload, label, baseCurrency = "USD" }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     return (
       <div className="rounded-lg border border-border bg-popover p-3 shadow-md text-xs space-y-1.5">
         <p className="font-semibold text-popover-foreground">{label} Performance</p>
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        {payload.map((item: any, idx: number) => (
+        {payload.map((item, idx: number) => (
           <div key={idx} className="flex items-center justify-between gap-4">
             <span className="flex items-center gap-1.5 text-muted-foreground">
               <span
@@ -39,7 +50,7 @@ function CustomTooltip({ active, payload, label, baseCurrency }: any) {
               {item.name}:
             </span>
             <span className="font-semibold text-foreground">
-              {formatMoney(item.value, baseCurrency)}
+              {formatMoney(item.value || 0, baseCurrency)}
             </span>
           </div>
         ))}

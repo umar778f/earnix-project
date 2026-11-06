@@ -1,6 +1,12 @@
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { toDecimal, addDecimals } from "@/lib/currency/format"
 
+interface JoinedPlatform {
+  id?: string
+  code?: string
+  name?: string
+}
+
 export interface ClientListItem {
   id: string
   name: string
@@ -200,8 +206,7 @@ export async function getClientsData(options?: { preferDemo?: boolean }): Promis
     }
 
     const mappedClients: ClientListItem[] = clientsData.map((c) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const platformObj = c.platform as any
+      const platformObj = c.platform as JoinedPlatform | null
       const stats = clientStats[c.id] || { total: 0, count: 0, lastDate: null }
 
       return {

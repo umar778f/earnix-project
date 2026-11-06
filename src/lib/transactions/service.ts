@@ -2,6 +2,17 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { toDecimal, addDecimals } from "@/lib/currency/format"
 import { type SourceType, type TransactionStatus } from "@/types/database.types"
 
+interface JoinedPlatform {
+  id?: string
+  code?: string
+  name?: string
+}
+
+interface JoinedClient {
+  id?: string
+  name?: string
+}
+
 export interface TransactionRecordItem {
   id: string
   referenceId: string | null
@@ -370,10 +381,8 @@ export async function getTransactionsData(options?: { preferDemo?: boolean }): P
         pending++
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const clientObj = tx.client as any
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const platformObj = tx.platform as any
+      const clientObj = tx.client as JoinedClient | null
+      const platformObj = tx.platform as JoinedPlatform | null
 
       return {
         id: tx.id,

@@ -2,6 +2,19 @@ import { type TaxPreparationData } from "@/lib/tax/service"
 import { type TransactionRecordItem } from "@/lib/transactions/service"
 import { type ExpenseItem } from "@/lib/expenses/service"
 
+/**
+ * Neutralizes Excel / Google Sheets formula injection (CWE-1236) and escapes double quotes.
+ */
+export function sanitizeCsvCell(value: unknown): string {
+  if (value === null || value === undefined) return '""'
+  let str = String(value)
+  // If the cell begins with formula execution characters, prefix with a single quote to force text interpretation
+  if (/^[=\+\-@\t\r]/.test(str)) {
+    str = "'" + str
+  }
+  return `"${str.replace(/"/g, '""')}"`
+}
+
 export function generateTaxReportCsv(params: {
   taxData: TaxPreparationData
   transactions: TransactionRecordItem[]
@@ -20,11 +33,11 @@ export function generateTaxReportCsv(params: {
 
   // Executive Tax Summary
   lines.push("EXECUTIVE TAX SUMMARY")
-  lines.push(`Tax Year,${taxData.taxYear}`)
-  lines.push(`Jurisdiction,${taxData.jurisdictionName} (${taxData.jurisdictionCode})`)
-  lines.push(`Business Entity,${taxData.businessName || "Freelance Sole Proprietor"}`)
-  lines.push(`Tax Identifier,${taxData.taxIdentifier || "Not registered"}`)
-  lines.push(`Reporting Currency,${taxData.baseCurrency}`)
+  lines.push(`Tax Year,${sanitizeCsvCell(taxData.taxYear)}`)
+  lines.push(`Jurisdiction,${sanitizeCsvCell(`${taxData.jurisdictionName} (${taxData.jurisdictionCode})`)}`)
+  lines.push(`Business Entity,${sanitizeCsvCell(taxData.businessName || "Freelance Sole Proprietor")}`)
+  lines.push(`Tax Identifier,${sanitizeCsvCell(taxData.taxIdentifier || "Not registered")}`)
+  lines.push(`Reporting Currency,${sanitizeCsvCell(taxData.baseCurrency)}`)
   lines.push(`Gross Freelance Revenue,${calc.grossIncome.toFixed(2)}`)
   lines.push(`Total Operating Expenses,${calc.totalExpenses.toFixed(2)}`)
   lines.push(`Allowable Business Deductions,${calc.allowableDeductions.toFixed(2)}`)
@@ -42,7 +55,7 @@ export function generateTaxReportCsv(params: {
   lines.push("Quarter,Period,Gross Income,Allowable Deductions,Net Income,Estimated Tax Liability,Transactions")
   for (const q of calc.quarterlyBreakdown) {
     lines.push(
-      `"${q.quarter}","${q.periodName}",${q.grossIncome.toFixed(2)},${q.allowableDeductions.toFixed(
+      `${sanitizeCsvCell(q.quarter)},${sanitizeCsvCell(q.periodName)},${q.grossIncome.toFixed(2)},${q.allowableDeductions.toFixed(
         2
       )},${q.netIncome.toFixed(2)},${q.estimatedTax.toFixed(2)},${q.transactionCount}`
     )
@@ -54,7 +67,7 @@ export function generateTaxReportCsv(params: {
   lines.push("Tax Category,Total Deductions,Expense Count,Percentage,Receipt Coverage")
   for (const c of calc.taxCategoryBreakdown) {
     lines.push(
-      `"${c.taxCategory}",${c.totalDeductions.toFixed(2)},${c.expenseCount},${c.percentageOfDeductions.toFixed(
+      `${sanitizeCsvCell(c.taxCategory)},${c.totalDeductions.toFixed(2)},${c.expenseCount},${c.percentageOfDeductions.toFixed(
         1
       )}%,${c.hasReceiptCoveragePct}%`
     )
@@ -68,11 +81,13 @@ export function generateTaxReportCsv(params: {
   )
   for (const t of transactions) {
     lines.push(
-      `"${t.paymentDate.split("T")[0]}","${t.referenceId || "N/A"}","${t.platformName}","${
-        t.clientName
-      }","${t.description.replace(/"/g, '""')}",${t.originalAmount.toFixed(2)},"${
-        t.originalCurrency
-      }",${t.exchangeRate.toFixed(6)},${t.convertedAmount.toFixed(2)},"${t.status}"`
+      `${sanitizeCsvCell(t.paymentDate.split("T")[0])},${sanitizeCsvCell(t.referenceId || "N/A")},${sanitizeCsvCell(
+        t.platformName
+      )},${sanitizeCsvCell(t.clientName)},${sanitizeCsvCell(t.description)},${t.originalAmount.toFixed(
+        2
+      )},${sanitizeCsvCell(t.originalCurrency)},${t.exchangeRate.toFixed(6)},${t.convertedAmount.toFixed(
+        2
+      )},${sanitizeCsvCell(t.status)}`
     )
   }
   lines.push("")
@@ -84,13 +99,13 @@ export function generateTaxReportCsv(params: {
   )
   for (const e of expenses) {
     lines.push(
-      `"${e.expenseDate}","${e.title.replace(/"/g, '""')}","${e.category}","${
+      `${sanitizeCsvCell(e.expenseDate)},${sanitizeCsvCell(e.title)},${sanitizeCsvCell(e.category)},${sanitizeCsvCell(
         e.taxCategory
-      }",${e.originalAmount.toFixed(2)},"${e.originalCurrency}",${e.exchangeRate.toFixed(
+      )},${e.originalAmount.toFixed(2)},${sanitizeCsvCell(e.originalCurrency)},${e.exchangeRate.toFixed(
         6
-      )},${e.convertedAmount.toFixed(2)},"${e.isTaxDeductible ? "YES" : "NO"}","${
+      )},${e.convertedAmount.toFixed(2)},"${e.isTaxDeductible ? "YES" : "NO"}",${sanitizeCsvCell(
         e.documentFileName || (e.documentId ? "Attached" : "None")
-      }"`
+      )}`
     )
   }
 

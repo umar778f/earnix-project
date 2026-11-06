@@ -139,19 +139,20 @@ flowchart LR
 
 ## 4. Test Suite & Verification Results
 
-Earnix includes an automated verification test suite covering 32 critical test cases:
+Earnix includes an automated verification test suite covering 35 critical test cases:
 ```bash
-npm run test:phase15
+npm test
 ```
 
 ### Verified Test Categories:
-1. **Financial Precision:** Verified `decimal.js` prevents floating-point inaccuracies.
+1. **Financial Precision:** Verified `decimal.js` prevents floating-point inaccuracies (`0.1 + 0.2 === 0.3`).
 2. **Dual-Ledger Invariants:** Verified USD/EUR/GBP/PKR exchange rate calculations and original amount preservation.
 3. **Tax Engine & Date Boundaries:** Verified empty ledger resilience, leap-year calculations (Feb 29), and Section 154A benchmark tax rates.
 4. **Statement Parsers:** Verified RFC 4180 Upwork parser and Generic CSV parser with quotes, commas, and negative fee rows.
 5. **AI Categorization Fallback:** Verified domain keyword taxonomy classification without network access.
-6. **Security & Input Sanitization:** Verified Zod schema rejection of negative amounts, invalid currencies, and directory traversal file uploads.
+6. **Security & Input Sanitization:** Verified Zod schema rejection of negative amounts, invalid currencies, directory traversal file uploads, OAuth open redirect prevention, and CSV formula injection neutralization (CWE-1236).
 
 ---
 
 *Earnix is ready for production evaluation and university graduation presentation.*
+

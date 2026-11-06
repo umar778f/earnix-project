@@ -10,6 +10,18 @@ import {
   DEMO_DASHBOARD_DATA,
 } from "@/lib/dashboard/demo-data"
 
+interface JoinedPlatform {
+  id?: string
+  code?: string
+  name?: string
+}
+
+interface JoinedClient {
+  id?: string
+  name?: string
+  country?: string | null
+}
+
 export async function getDashboardData(options?: {
   preferDemo?: boolean
 }): Promise<DashboardData> {
@@ -118,8 +130,7 @@ export async function getDashboardData(options?: {
         }
 
         // Platform aggregation
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const platformObj = tx.platform as any
+        const platformObj = tx.platform as JoinedPlatform | null
         const pCode = platformObj?.code || "other"
         const pName = platformObj?.name || "Direct / Other"
         if (!platformTotals[pCode]) {
@@ -136,9 +147,8 @@ export async function getDashboardData(options?: {
         currencyTotals[cCode].converted = toDecimal(currencyTotals[cCode].converted).plus(amountDec).toNumber()
 
         // Client aggregation
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const clientObj = tx.client as any
-        if (clientObj?.id) {
+        const clientObj = tx.client as JoinedClient | null
+        if (clientObj?.id && clientObj?.name) {
           if (!clientEarnings[clientObj.id]) {
             clientEarnings[clientObj.id] = {
               id: clientObj.id,
@@ -153,14 +163,14 @@ export async function getDashboardData(options?: {
         }
       }
 
+      const txClient = tx.client as JoinedClient | null
+      const txPlatform = tx.platform as JoinedPlatform | null
+
       mappedTransactions.push({
         id: tx.id,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        clientName: (tx.client as any)?.name || "Direct Client",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        platformCode: (tx.platform as any)?.code || "other",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        platformName: (tx.platform as any)?.name || "Direct",
+        clientName: txClient?.name || "Direct Client",
+        platformCode: txPlatform?.code || "other",
+        platformName: txPlatform?.name || "Direct",
         description: tx.description,
         originalAmount: toDecimal(tx.original_amount).toNumber(),
         originalCurrency: tx.original_currency,

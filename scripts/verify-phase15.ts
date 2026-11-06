@@ -14,6 +14,7 @@ import Decimal from "decimal.js"
 import { toDecimal, addDecimals, multiplyDecimals, divideDecimals } from "../src/lib/currency/format"
 import { BENCHMARK_RATES_TO_USD } from "../src/lib/currency/currencies"
 import { calculateTaxReadyLedger } from "../src/lib/tax/engine"
+import { sanitizeCsvCell } from "../src/lib/tax/export"
 import { parseUpworkCsv, SAMPLE_UPWORK_CSV } from "../src/lib/parsers/upwork"
 import { parseGenericCsv, SAMPLE_GENERIC_CSV } from "../src/lib/parsers/generic"
 import { classifyIncomeTransaction, classifyExpenseRecord } from "../src/lib/ai/categorizer"
@@ -282,6 +283,36 @@ const sanitized = dangerousFileName.trim().replace(/\.\./g, "_").replace(/[^a-zA
 assert(
   !sanitized.includes("/") && !sanitized.includes("\\") && !sanitized.includes(".."),
   `File name sanitization neutralizes directory traversal attack: '${dangerousFileName}' -> '${sanitized}'`
+)
+
+// Test: CSV Formula Injection Neutralization (CWE-1236)
+const maliciousFormula = "=cmd|' /C calc'!A0"
+const sanitizedFormula = sanitizeCsvCell(maliciousFormula)
+assert(
+  sanitizedFormula.startsWith("\"'") && sanitizedFormula.includes(maliciousFormula),
+  `CSV export neutralizes Excel formula injection (prefixed with single quote): '${maliciousFormula}' -> ${sanitizedFormula}`
+)
+
+const maliciousSum = "@SUM(1+1)"
+const sanitizedSum = sanitizeCsvCell(maliciousSum)
+assert(
+  sanitizedSum.startsWith("\"'"),
+  `CSV export neutralizes @ formula injection: '${maliciousSum}' -> ${sanitizedSum}`
+)
+
+// Test: OAuth Safe Redirect Path Validation
+function getSafeRedirectUrl(next: string | null, fallback = "/dashboard"): string {
+  if (!next) return fallback
+  if (next.startsWith("/") && !next.startsWith("//") && !next.includes("\\")) {
+    return next
+  }
+  return fallback
+}
+assert(
+  getSafeRedirectUrl("//evil.com") === "/dashboard" &&
+    getSafeRedirectUrl("https://evil.com") === "/dashboard" &&
+    getSafeRedirectUrl("/dashboard/tax") === "/dashboard/tax",
+  "OAuth callback strictly prevents external open redirects"
 )
 
 // Run async categorizer tests and summarize

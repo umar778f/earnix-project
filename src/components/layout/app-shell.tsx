@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
+import { getUserNotifications } from "@/lib/notifications/service"
 
 interface AppShellProps {
   children: React.ReactNode
@@ -10,6 +11,8 @@ export async function AppShell({ children }: AppShellProps) {
   let userEmail: string | null = null
   let userName: string | null = null
   let baseCurrency = "USD"
+
+  const { notifications } = await getUserNotifications()
 
   if (isSupabaseConfigured()) {
     try {
@@ -44,7 +47,12 @@ export async function AppShell({ children }: AppShellProps) {
       {/* Main App Wrapper (offset on md+ screens) */}
       <div className="flex flex-col min-h-screen md:pl-64 transition-[padding] duration-200">
         {/* Top Header */}
-        <Header userEmail={userEmail} userName={userName} baseCurrency={baseCurrency} />
+        <Header
+          userEmail={userEmail}
+          userName={userName}
+          baseCurrency={baseCurrency}
+          notifications={notifications}
+        />
 
         {/* Dynamic Route Content */}
         <main className="flex-1 pb-12 focus:outline-none" tabIndex={-1}>
