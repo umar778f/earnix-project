@@ -27,6 +27,15 @@ export function RecentTransactionsFeed({
     }
   }
 
+  if (transactions.length === 0) {
+    return (
+      <div className="py-8 text-center text-xs text-muted-foreground space-y-1">
+        <p className="font-medium text-foreground">No recent transactions</p>
+        <p className="text-[11px]">Import an Upwork CSV or record a payment to populate your income ledger.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       <div className="divide-y divide-border/60">

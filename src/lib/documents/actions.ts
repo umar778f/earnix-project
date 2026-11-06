@@ -50,6 +50,7 @@ export async function uploadDocumentAction(formData: FormData): Promise<Document
 
   const sanitizedFileName = customFileName
     .trim()
+    .replace(/\.\./g, "_")
     .replace(/[^a-zA-Z0-9._-]/g, "_")
     .slice(0, 100)
 

@@ -130,6 +130,10 @@ CREATE POLICY "Users can update own tax profile"
     USING (auth.uid() = user_id)
     WITH CHECK (auth.uid() = user_id);
 
+CREATE POLICY "Users can delete own tax profile"
+    ON public.tax_profiles FOR DELETE
+    USING (auth.uid() = user_id);
+
 -- ------------------------------------------------------------------------------
 -- 9. EXCHANGE RATES POLICIES (Global read-only cache for authenticated users)
 -- ------------------------------------------------------------------------------
@@ -144,6 +148,10 @@ CREATE POLICY "Authenticated users can view exchange rates"
 CREATE POLICY "Users can view own notifications"
     ON public.notifications FOR SELECT
     USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own notifications"
+    ON public.notifications FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update own notifications"
     ON public.notifications FOR UPDATE

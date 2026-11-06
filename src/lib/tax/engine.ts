@@ -235,6 +235,7 @@ function computeQuarterlyBreakdown(params: {
     for (const t of transactions) {
       if (t.status !== "completed") continue
       const date = new Date(t.paymentDate)
+      if (isNaN(date.getTime())) continue
       const month = date.getMonth() + 1
       if (month >= q.startMonth && month <= q.endMonth) {
         qIncomeDec = addDecimals(qIncomeDec, toDecimal(t.convertedAmount))
@@ -245,6 +246,7 @@ function computeQuarterlyBreakdown(params: {
     for (const e of expenses) {
       if (!e.isTaxDeductible) continue
       const date = new Date(e.expenseDate)
+      if (isNaN(date.getTime())) continue
       const month = date.getMonth() + 1
       if (month >= q.startMonth && month <= q.endMonth) {
         qDeductionsDec = addDecimals(qDeductionsDec, toDecimal(e.convertedAmount))

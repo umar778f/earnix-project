@@ -9,6 +9,15 @@ interface TopClientsCardProps {
 }
 
 export function TopClientsCard({ clients, baseCurrency }: TopClientsCardProps) {
+  if (clients.length === 0) {
+    return (
+      <div className="py-8 text-center text-xs text-muted-foreground space-y-1">
+        <p className="font-medium text-foreground">No client data yet</p>
+        <p className="text-[11px]">Clients will appear here automatically when transactions are recorded.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       <div className="space-y-2.5">

@@ -52,3 +52,4 @@ export const DEMO_NOTIFICATIONS: NotificationItem[] = [
     createdAt: "2 days ago",
   },
 ]
+
