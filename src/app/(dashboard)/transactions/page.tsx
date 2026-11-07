@@ -4,8 +4,8 @@ import { TransactionTableView } from "@/components/transactions/transaction-tabl
 import { getTransactionsData } from "@/lib/transactions/service"
 
 export const metadata = {
-  title: "Transactions — Earnix Financial Ledger",
-  description: "Comprehensive income records, multi-currency ledger, Upwork statement imports, and manual payments.",
+  title: "Transactions | Earnix",
+  description: "Income records, multi-currency ledger, Upwork statement imports, and manual payments.",
 }
 
 export default async function TransactionsPage() {
@@ -15,7 +15,7 @@ export default async function TransactionsPage() {
     <PageContainer>
       <PageHeader
         title="Income &amp; Transactions Ledger"
-        description="Immutable financial ledger recording payments across platforms with dual-value currency preservation."
+        description="Records payments across platforms in original and converted currencies."
       />
 
       <TransactionTableView

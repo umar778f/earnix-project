@@ -31,7 +31,7 @@ export default function AuthLayout({
       {/* Footer */}
       <footer className="text-center text-xs text-muted-foreground/80 py-4 max-w-md mx-auto">
         <p>
-          Earnix &copy; 2026 — Freelancer Financial Recordkeeping Platform
+          Earnix &copy; 2026. Freelance financial recordkeeping.
         </p>
       </footer>
     </div>

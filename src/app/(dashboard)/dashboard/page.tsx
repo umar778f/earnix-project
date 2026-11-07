@@ -13,7 +13,7 @@ import { TopClientsCard } from "@/components/dashboard/top-clients-card"
 import { UploadCloud, FileText, ArrowRight } from "lucide-react"
 
 export const metadata = {
-  title: "Dashboard — Earnix Freelancer Management",
+  title: "Dashboard | Earnix",
   description: "Unified financial dashboard, multi-currency ledger velocity, and tax-ready estimates.",
 }
 

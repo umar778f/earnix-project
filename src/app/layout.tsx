@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Earnix — Freelancer Income Management & Tax Preparation",
+  title: "Earnix | Freelancer Income Management & Tax Preparation",
   description:
-    "AI-powered financial recordkeeping and tax-ready reporting platform designed specifically for freelancers.",
+    "Financial recordkeeping and tax-ready reporting platform designed specifically for freelancers.",
 };
 
 export default function RootLayout({

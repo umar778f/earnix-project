@@ -43,7 +43,7 @@ export function CopilotChat() {
     {
       id: "welcome-msg",
       sender: "copilot",
-      text: "Hello! I am Earnix Copilot, your grounded financial assistant. Ask me questions about your freelance earnings, client milestones, multi-currency conversions, or tax-deductible expenses. Every answer is deterministically verified against your immutable database ledger.",
+      text: "Ask questions about your freelance earnings, client milestones, currency conversions, or business expenses.",
       timestamp: "Just now",
     },
   ])

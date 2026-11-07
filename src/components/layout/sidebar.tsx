@@ -29,13 +29,8 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
       </div>
 
       {/* Main Navigation links */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
-        <div>
-          <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-            Platform Menu
-          </p>
-          <MainNavLinks />
-        </div>
+      <div className="flex-1 overflow-y-auto px-3 py-4">
+        <MainNavLinks />
       </div>
 
       {/* Bottom section */}

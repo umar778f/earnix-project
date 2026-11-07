@@ -17,60 +17,55 @@ import {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased">
-      {/* 1. CLEAN TOP NAVBAR */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto flex h-16 items-center justify-between px-6">
+    <div className="min-h-screen flex flex-col bg-background text-foreground antialiased">
+      {/* 1. TOP NAVIGATION */}
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-xs">
+        <div className="max-w-6xl mx-auto flex h-14 items-center justify-between px-4 sm:px-6">
           {/* Brand */}
           <Link
             href="/"
-            className="flex items-center gap-2.5 font-semibold text-slate-900 dark:text-white"
+            className="flex items-center gap-2 font-semibold text-foreground tracking-tight"
           >
-            <div className="flex size-7 items-center justify-center rounded-md bg-teal-600 text-white">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
               <Sparkles className="size-4" />
             </div>
-            <span className="text-lg font-bold tracking-tight">
-              Earnix<span className="text-teal-600 dark:text-teal-400">.org</span>
-            </span>
+            <span className="text-base font-bold">Earnix</span>
           </Link>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm text-slate-600 dark:text-slate-400">
-            <Link href="#home" className="hover:text-slate-900 dark:hover:text-white transition-colors">
-              Home
-            </Link>
-            <Link href="#features" className="hover:text-slate-900 dark:hover:text-white transition-colors">
+          <nav className="hidden md:flex items-center gap-6 text-xs sm:text-sm text-muted-foreground">
+            <Link href="#features" className="hover:text-foreground transition-colors">
               Features
             </Link>
-            <Link href="#how-it-works" className="hover:text-slate-900 dark:hover:text-white transition-colors">
+            <Link href="#how-it-works" className="hover:text-foreground transition-colors">
               How it works
             </Link>
-            <Link href="#tax-engine" className="hover:text-slate-900 dark:hover:text-white transition-colors">
-              Tax engine
+            <Link href="#tax-engine" className="hover:text-foreground transition-colors">
+              Tax calculation
             </Link>
           </nav>
 
           {/* Auth Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <ThemeToggle />
             <Link
               href="/login"
               className={cn(
                 buttonVariants({ variant: "ghost", size: "sm" }),
-                "text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                "text-xs"
               )}
             >
-              <LogIn className="size-4 mr-1.5" />
+              <LogIn className="size-3.5 mr-1" />
               <span>Enter here</span>
             </Link>
             <Link
               href="/signup"
               className={cn(
-                buttonVariants({ size: "sm" }),
-                "text-sm font-medium bg-teal-600 hover:bg-teal-700 text-white shadow-xs"
+                buttonVariants({ variant: "default", size: "sm" }),
+                "text-xs"
               )}
             >
-              <UserPlus className="size-4 mr-1.5" />
+              <UserPlus className="size-3.5 mr-1" />
               <span>Create account</span>
             </Link>
           </div>
@@ -78,73 +73,77 @@ export default function HomePage() {
       </header>
 
       {/* 2. HERO SECTION */}
-      <section id="home" className="py-16 md:py-24 border-b border-slate-200/70 dark:border-slate-800/80">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            {/* Left Column: Quiet, Crisp Product Preview */}
+      <section className="py-12 md:py-20 border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            {/* Left Column: Product Preview */}
             <div className="lg:col-span-6 order-2 lg:order-1">
-              <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+              <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-4">
                 {/* Header bar */}
-                <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center justify-between pb-3 border-b border-border/60">
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                      Financial overview
+                    <h3 className="text-xs font-semibold text-foreground">
+                      Financial snapshot
                     </h3>
-                    <p className="text-xs text-slate-500">Dual-ledger accounting</p>
+                    <p className="text-[11px] text-muted-foreground">Dual-ledger accounting</p>
                   </div>
-                  <span className="text-xs font-medium text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded border border-teal-200/60 dark:border-teal-800">
-                    Live ledger
+                  <span className="text-[11px] font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded border border-border/60">
+                    Active
                   </span>
                 </div>
 
-                {/* 3 Quiet KPI Numbers */}
-                <div className="grid grid-cols-3 gap-4 py-5 border-b border-slate-100 dark:border-slate-800">
-                  <div>
-                    <p className="text-xs text-slate-500">Gross income</p>
-                    <p className="text-base font-semibold text-slate-900 dark:text-white font-mono mt-0.5">
-                      $12,450
+                {/* 3 KPI Numbers matching Dashboard MetricsGrid */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="rounded-lg border border-border/80 bg-muted/40 p-3 space-y-0.5">
+                    <p className="text-[11px] text-muted-foreground">Gross income</p>
+                    <p className="text-base font-bold text-foreground font-mono">
+                      $12,450.00
                     </p>
-                    <p className="text-[11px] text-slate-400 font-mono">₨3.47M</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500">Expenses</p>
-                    <p className="text-base font-semibold text-slate-900 dark:text-white font-mono mt-0.5">
-                      $1,280
+                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono">
+                      ₨3,472,325
                     </p>
-                    <p className="text-[11px] text-teal-600 dark:text-teal-400 font-medium">100% receipts</p>
                   </div>
-                  <div>
-                    <p className="text-xs text-slate-500">Tax reserve (1%)</p>
-                    <p className="text-base font-semibold text-teal-600 dark:text-teal-400 font-mono mt-0.5">
+
+                  <div className="rounded-lg border border-border/80 bg-muted/40 p-3 space-y-0.5">
+                    <p className="text-[11px] text-muted-foreground">Expenses</p>
+                    <p className="text-base font-bold text-foreground font-mono">
+                      $1,280.00
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">100% receipts</p>
+                  </div>
+
+                  <div className="rounded-lg border border-border/80 bg-muted/40 p-3 space-y-0.5">
+                    <p className="text-[11px] text-muted-foreground">Tax reserve (1%)</p>
+                    <p className="text-base font-bold text-foreground font-mono">
                       $124.50
                     </p>
-                    <p className="text-[11px] text-slate-400">Section 154A</p>
+                    <p className="text-[10px] text-muted-foreground">Section 154A</p>
                   </div>
                 </div>
 
-                {/* Clean Ledger Records snippet */}
-                <div className="pt-4 space-y-2.5">
-                  <p className="text-xs font-medium text-slate-500">Recent records</p>
-                  <div className="space-y-2 text-xs">
-                    <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-slate-50 dark:bg-slate-800/60">
+                {/* Simulated Ledger Table matching RecentTransactionsFeed */}
+                <div className="pt-2 space-y-2">
+                  <p className="text-[11px] font-medium text-muted-foreground">Recent ledger records</p>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between p-2.5 rounded-lg border border-border/60 bg-muted/30">
                       <div>
-                        <p className="font-medium text-slate-800 dark:text-slate-200">Upwork milestone</p>
-                        <p className="text-[11px] text-slate-400">Web application contract</p>
+                        <p className="font-medium text-foreground">Upwork milestone payment</p>
+                        <p className="text-[11px] text-muted-foreground">Full-stack development</p>
                       </div>
                       <div className="text-right font-mono">
-                        <p className="font-semibold text-teal-600 dark:text-teal-400">+$2,500.00</p>
-                        <p className="text-[10px] text-slate-400">₨697,250</p>
+                        <p className="font-semibold text-emerald-600 dark:text-emerald-400">+$2,500.00</p>
+                        <p className="text-[10px] text-muted-foreground">₨697,250</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-slate-50 dark:bg-slate-800/60">
+                    <div className="flex items-center justify-between p-2.5 rounded-lg border border-border/60 bg-muted/30">
                       <div>
-                        <p className="font-medium text-slate-800 dark:text-slate-200">Cloud hosting &amp; tools</p>
-                        <p className="text-[11px] text-slate-400">Tax deductible expense</p>
+                        <p className="font-medium text-foreground">Cloud infrastructure</p>
+                        <p className="text-[11px] text-muted-foreground">Operational deduction</p>
                       </div>
                       <div className="text-right font-mono">
-                        <p className="font-semibold text-slate-700 dark:text-slate-300">-$84.20</p>
-                        <p className="text-[10px] text-slate-400">Verified</p>
+                        <p className="font-semibold text-foreground">-$84.20</p>
+                        <p className="text-[10px] text-emerald-600 dark:text-emerald-400">Receipt attached</p>
                       </div>
                     </div>
                   </div>
@@ -152,42 +151,34 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Column: Clean Typography & Restrained Content */}
-            <div className="lg:col-span-6 order-1 lg:order-2 space-y-6">
-              <div className="space-y-3">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
-                  Personal and freelance finance, without spreadsheet chaos.
+            {/* Right Column: Hero Copy */}
+            <div className="lg:col-span-6 order-1 lg:order-2 space-y-5">
+              <div className="space-y-2">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
+                  Financial records and tax estimates for freelancers.
                 </h1>
-                <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
-                  An easy, secure system to track multi-currency income, deduct business expenses, and calculate tax reserves on any device.
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  Track international client income, record deductible business expenses, and calculate tax reserves on any device.
                 </p>
               </div>
 
-              {/* Simple, un-hyped bullet list */}
-              <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
-                <li className="flex items-start gap-3">
-                  <div className="size-5 rounded-full bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="size-3" />
-                  </div>
-                  <span>More reliable than spreadsheets: dual-ledger accounting without math drift.</span>
+              {/* Bullet Points */}
+              <ul className="space-y-2.5 text-xs sm:text-sm text-foreground">
+                <li className="flex items-start gap-2.5">
+                  <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span>Dual-ledger tracking with original foreign currencies and daily converted values.</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <div className="size-5 rounded-full bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="size-3" />
-                  </div>
-                  <span>Know where your money goes and what qualifies as a deductible expense.</span>
+                <li className="flex items-start gap-2.5">
+                  <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span>CSV statement imports for Upwork and generic bank accounts.</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <div className="size-5 rounded-full bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="size-3" />
-                  </div>
-                  <span>Automated statement ingestion for Upwork and standard bank CSV exports.</span>
+                <li className="flex items-start gap-2.5">
+                  <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span>Receipt attachment and proof tracking for deductible business costs.</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <div className="size-5 rounded-full bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="size-3" />
-                  </div>
-                  <span>Automatic tax reserve estimates for IT exporters (FBR 154A 1%), IRS, or HMRC.</span>
+                <li className="flex items-start gap-2.5">
+                  <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span>Tax reserve calculations for Section 154A (1%), IRS, and HMRC rules.</span>
                 </li>
               </ul>
 
@@ -195,22 +186,16 @@ export default function HomePage() {
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <Link
                   href="/signup"
-                  className={cn(
-                    buttonVariants({ size: "default" }),
-                    "bg-teal-600 hover:bg-teal-700 text-white font-medium px-6 py-2.5 shadow-xs"
-                  )}
+                  className={cn(buttonVariants({ variant: "default", size: "default" }))}
                 >
-                  <UserPlus className="size-4 mr-2" />
-                  <span>Create your account</span>
+                  <UserPlus className="size-4 mr-1.5" />
+                  <span>Create an account</span>
                 </Link>
                 <Link
                   href="/login"
-                  className={cn(
-                    buttonVariants({ variant: "outline", size: "default" }),
-                    "border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 px-6 py-2.5"
-                  )}
+                  className={cn(buttonVariants({ variant: "outline", size: "default" }))}
                 >
-                  <LogIn className="size-4 mr-2" />
+                  <LogIn className="size-4 mr-1.5" />
                   <span>Enter here</span>
                 </Link>
               </div>
@@ -219,146 +204,146 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. FEATURES (Clean, disciplined 6-grid like Economizzer) */}
-      <section id="features" className="py-20 bg-white dark:bg-slate-900/60">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="max-w-2xl mx-auto text-center mb-16 space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+      {/* 3. FEATURES */}
+      <section id="features" className="py-14 md:py-20 border-b border-border bg-muted/20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="max-w-2xl mx-auto text-center mb-12 space-y-1">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
               Features
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
-              Straightforward tools designed for independent contractors, consultants, and remote workers.
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Accounting tools designed for independent contractors and consultants.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {/* Feature 1 */}
-            <div className="space-y-3 p-5 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
-              <div className="size-10 rounded-lg bg-teal-100/80 dark:bg-teal-950 text-teal-700 dark:text-teal-400 flex items-center justify-center">
-                <Smartphone className="size-5" />
+            <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-2">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Smartphone className="size-4" />
               </div>
-              <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+              <h3 className="text-sm font-semibold text-foreground">
                 Responsive interface
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Clean and fast on laptops, tablets, and smartphones without unnecessary UI noise.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Clean, keyboard-accessible design that runs fast on desktops, laptops, tablets, and phones.
               </p>
             </div>
 
             {/* Feature 2 */}
-            <div className="space-y-3 p-5 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
-              <div className="size-10 rounded-lg bg-teal-100/80 dark:bg-teal-950 text-teal-700 dark:text-teal-400 flex items-center justify-center">
-                <LayoutDashboard className="size-5" />
+            <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-2">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <LayoutDashboard className="size-4" />
               </div>
-              <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+              <h3 className="text-sm font-semibold text-foreground">
                 Financial dashboards
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Clear charts for monthly income velocity, client distribution, and deductible spending.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Charts showing monthly earnings velocity, client distribution, and deductible costs.
               </p>
             </div>
 
             {/* Feature 3 */}
-            <div className="space-y-3 p-5 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
-              <div className="size-10 rounded-lg bg-teal-100/80 dark:bg-teal-950 text-teal-700 dark:text-teal-400 flex items-center justify-center">
-                <Coins className="size-5" />
+            <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-2">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Coins className="size-4" />
               </div>
-              <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+              <h3 className="text-sm font-semibold text-foreground">
                 Multi-currency ledger
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Store original contract amounts in USD, EUR, or GBP alongside converted local currency.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Store original contract values in USD, EUR, or GBP alongside your local reporting currency.
               </p>
             </div>
 
             {/* Feature 4 */}
-            <div className="space-y-3 p-5 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
-              <div className="size-10 rounded-lg bg-teal-100/80 dark:bg-teal-950 text-teal-700 dark:text-teal-400 flex items-center justify-center">
-                <FileSpreadsheet className="size-5" />
+            <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-2">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <FileSpreadsheet className="size-4" />
               </div>
-              <h3 className="text-base font-semibold text-slate-900 dark:text-white">
-                CSV statement import
+              <h3 className="text-sm font-semibold text-foreground">
+                CSV statement imports
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Upload Upwork transaction histories or generic bank CSV files with duplicate detection.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Upload Upwork transaction histories or standard bank CSV files with duplicate detection.
               </p>
             </div>
 
             {/* Feature 5 */}
-            <div className="space-y-3 p-5 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
-              <div className="size-10 rounded-lg bg-teal-100/80 dark:bg-teal-950 text-teal-700 dark:text-teal-400 flex items-center justify-center">
-                <Calculator className="size-5" />
+            <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-2">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Calculator className="size-4" />
               </div>
-              <h3 className="text-base font-semibold text-slate-900 dark:text-white">
-                Tax-ready estimates
+              <h3 className="text-sm font-semibold text-foreground">
+                Tax reserve estimates
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 Deterministic calculation of estimated tax reserves with receipt substantiation tracking.
               </p>
             </div>
 
             {/* Feature 6 */}
-            <div className="space-y-3 p-5 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
-              <div className="size-10 rounded-lg bg-teal-100/80 dark:bg-teal-950 text-teal-700 dark:text-teal-400 flex items-center justify-center">
-                <ShieldCheck className="size-5" />
+            <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-2">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <ShieldCheck className="size-4" />
               </div>
-              <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+              <h3 className="text-sm font-semibold text-foreground">
                 Data isolation
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Every record is strictly isolated per account with PostgreSQL Row Level Security (RLS).
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Every record is strictly isolated per account with PostgreSQL Row Level Security.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. HOW IT WORKS (Quiet, readable 3-step sequence) */}
-      <section id="how-it-works" className="py-20 border-t border-slate-200/70 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-14 space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+      {/* 4. HOW IT WORKS */}
+      <section id="how-it-works" className="py-14 md:py-20 border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10 space-y-1">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
               How it works
             </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Get started in three simple steps.
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Three steps to organize your records.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="space-y-2.5 text-center md:text-left">
-              <span className="text-xs font-bold text-teal-700 dark:text-teal-400 bg-teal-100/80 dark:bg-teal-950 px-2.5 py-1 rounded">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-2">
+              <span className="text-[11px] font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded border border-border/60">
                 Step 1
               </span>
-              <h3 className="text-base font-semibold text-slate-900 dark:text-white pt-1">
-                Create your account
+              <h3 className="text-sm font-semibold text-foreground pt-1">
+                Create an account
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Register in seconds with email and password to start your private ledger.
+              <p className="text-xs text-muted-foreground">
+                Register with your email and select your preferred display currency.
               </p>
             </div>
 
-            <div className="space-y-2.5 text-center md:text-left">
-              <span className="text-xs font-bold text-teal-700 dark:text-teal-400 bg-teal-100/80 dark:bg-teal-950 px-2.5 py-1 rounded">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-2">
+              <span className="text-[11px] font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded border border-border/60">
                 Step 2
               </span>
-              <h3 className="text-base font-semibold text-slate-900 dark:text-white pt-1">
+              <h3 className="text-sm font-semibold text-foreground pt-1">
                 Record or import
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
+              <p className="text-xs text-muted-foreground">
                 Log earnings manually or drag-and-drop Upwork and bank CSV statements.
               </p>
             </div>
 
-            <div className="space-y-2.5 text-center md:text-left">
-              <span className="text-xs font-bold text-teal-700 dark:text-teal-400 bg-teal-100/80 dark:bg-teal-950 px-2.5 py-1 rounded">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-2">
+              <span className="text-[11px] font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded border border-border/60">
                 Step 3
               </span>
-              <h3 className="text-base font-semibold text-slate-900 dark:text-white pt-1">
+              <h3 className="text-sm font-semibold text-foreground pt-1">
                 Track and file
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                View net profits, deduct valid expenses, and export tax reports.
+              <p className="text-xs text-muted-foreground">
+                View net profits, deduct valid expenses, and export tax reports for filing.
               </p>
             </div>
           </div>
@@ -366,35 +351,38 @@ export default function HomePage() {
       </section>
 
       {/* 5. TAX ENGINE SECTION */}
-      <section id="tax-engine" className="py-20 border-t border-slate-200/70 dark:border-slate-800 bg-white dark:bg-slate-900">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="space-y-4">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Deterministic tax calculation
-            </h2>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-              Earnix estimates taxes using strict decimal arithmetic rather than estimates or guesswork:
-            </p>
-            <div className="space-y-3 pt-2 text-sm text-slate-700 dark:text-slate-300">
-              <p className="flex items-start gap-2.5">
-                <span className="font-semibold text-teal-600">1.</span>
-                <span><strong>Gross inflow:</strong> Converted at verified daily exchange rates without rounding error.</span>
+      <section id="tax-engine" className="py-14 md:py-20 border-b border-border bg-muted/20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="rounded-xl border border-border bg-card p-6 sm:p-8 shadow-xs space-y-4">
+            <div className="space-y-1">
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
+                Tax calculation method
+              </h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Earnix computes tax estimates using strict decimal arithmetic:
               </p>
-              <p className="flex items-start gap-2.5">
-                <span className="font-semibold text-teal-600">2.</span>
-                <span><strong>Deductible expenses:</strong> Operational costs (software, hardware, cloud) reduce taxable income.</span>
+            </div>
+
+            <div className="space-y-2.5 text-xs sm:text-sm text-foreground">
+              <p className="flex items-start gap-2">
+                <span className="font-mono text-xs text-muted-foreground shrink-0 mt-0.5">1.</span>
+                <span><strong>Gross inflow:</strong> Aggregates payments in original currencies and converts them at payment date rates.</span>
               </p>
-              <p className="flex items-start gap-2.5">
-                <span className="font-semibold text-teal-600">3.</span>
-                <span><strong>Net taxable income:</strong> Gross income minus verified deductible expenses.</span>
+              <p className="flex items-start gap-2">
+                <span className="font-mono text-xs text-muted-foreground shrink-0 mt-0.5">2.</span>
+                <span><strong>Deductible expenses:</strong> Substantiated operational costs reduce your net taxable income.</span>
               </p>
-              <p className="flex items-start gap-2.5">
-                <span className="font-semibold text-teal-600">4.</span>
-                <span><strong>Regime benchmark:</strong> 1.00% IT export reserve (FBR 154A), IRS self-employment, or HMRC.</span>
+              <p className="flex items-start gap-2">
+                <span className="font-mono text-xs text-muted-foreground shrink-0 mt-0.5">3.</span>
+                <span><strong>Net taxable income:</strong> Gross earnings minus verified deductible expenses.</span>
               </p>
-              <p className="flex items-start gap-2.5">
-                <span className="font-semibold text-teal-600">5.</span>
-                <span><strong>Withholding tax credits:</strong> Pre-deducted bank taxes offset directly against liability.</span>
+              <p className="flex items-start gap-2">
+                <span className="font-mono text-xs text-muted-foreground shrink-0 mt-0.5">4.</span>
+                <span><strong>Regime benchmark:</strong> Applies Pakistan Section 154A (1%), US self-employment, or UK HMRC rates.</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="font-mono text-xs text-muted-foreground shrink-0 mt-0.5">5.</span>
+                <span><strong>Withholding tax credits:</strong> Pre-deducted bank taxes are credited against the estimate.</span>
               </p>
             </div>
           </div>
@@ -402,53 +390,47 @@ export default function HomePage() {
       </section>
 
       {/* 6. CALL TO ACTION BANNER */}
-      <section className="py-16 bg-teal-700 text-white">
-        <div className="max-w-4xl mx-auto px-6 text-center space-y-6">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            Ready to organize your freelance finances?
+      <section className="py-14 border-b border-border bg-card">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-4">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+            Manage your freelance finances
           </h2>
-          <p className="text-teal-100 text-sm sm:text-base max-w-xl mx-auto">
-            Take control of your client earnings, deductible expenses, and tax records.
+          <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto">
+            Organize foreign client payments, deductible expenses, and tax records in one place.
           </p>
           <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/signup"
-              className={cn(
-                buttonVariants({ size: "default" }),
-                "bg-white hover:bg-slate-100 text-teal-800 font-semibold px-6 py-2.5 shadow-sm"
-              )}
+              className={cn(buttonVariants({ variant: "default", size: "default" }))}
             >
-              <UserPlus className="size-4 mr-2 text-teal-700" />
-              <span>Create your account</span>
+              <UserPlus className="size-4 mr-1.5" />
+              <span>Create an account</span>
             </Link>
             <Link
               href="/login"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "default" }),
-                "border-white/40 text-white hover:bg-white/10 font-medium px-6 py-2.5"
-              )}
+              className={cn(buttonVariants({ variant: "outline", size: "default" }))}
             >
-              <LogIn className="size-4 mr-2" />
+              <LogIn className="size-4 mr-1.5" />
               <span>Enter here</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* 7. QUIET FOOTER */}
-      <footer className="border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 py-10 text-xs text-slate-500">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* 7. FOOTER */}
+      <footer className="py-8 bg-background text-xs text-muted-foreground">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p>
-            Earnix.org &copy; 2026 — Personal finance manager for freelancers.
+            Earnix &copy; 2026. Financial recordkeeping for freelancers.
           </p>
-          <div className="flex items-center gap-6 text-slate-600 dark:text-slate-400">
-            <Link href="/login" className="hover:text-slate-900 dark:hover:text-white">
+          <div className="flex items-center gap-5">
+            <Link href="/login" className="hover:text-foreground transition-colors">
               Enter here
             </Link>
-            <Link href="/signup" className="hover:text-slate-900 dark:hover:text-white">
+            <Link href="/signup" className="hover:text-foreground transition-colors">
               Create account
             </Link>
-            <Link href="/forgot-password" className="hover:text-slate-900 dark:hover:text-white">
+            <Link href="/forgot-password" className="hover:text-foreground transition-colors">
               Reset password
             </Link>
           </div>

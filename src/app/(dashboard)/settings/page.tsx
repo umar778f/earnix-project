@@ -6,7 +6,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { Globe, Shield, Sliders, ShieldCheck } from "lucide-react"
 
 export const metadata = {
-  title: "Settings — Earnix Financial Preferences",
+  title: "Settings | Earnix",
   description: "Manage default base display currency, exchange rate synchronization, tax jurisdiction, and security settings.",
 }
 

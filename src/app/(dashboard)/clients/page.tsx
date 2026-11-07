@@ -4,7 +4,7 @@ import { ClientTableView } from "@/components/clients/client-table-view"
 import { getClientsData } from "@/lib/clients/service"
 
 export const metadata = {
-  title: "Clients — Earnix Freelancer Management",
+  title: "Clients | Earnix",
   description: "Client directory, lifetime earnings tracking, platform relationships, and billing notes.",
 }
 
