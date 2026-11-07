@@ -27,7 +27,7 @@ export async function getUserNotifications(): Promise<{
           .order("created_at", { ascending: false })
           .limit(15)
 
-        if (!error && data && data.length > 0) {
+        if (!error && data) {
           const mapped: NotificationItem[] = data.map((n) => ({
             id: n.id,
             title: n.title,
@@ -47,9 +47,7 @@ export async function getUserNotifications(): Promise<{
     }
   }
 
-  // Academic FYP Demo Fallback
-  const unreadCount = DEMO_NOTIFICATIONS.filter((n) => !n.isRead).length
-  return { notifications: DEMO_NOTIFICATIONS, unreadCount }
+  return { notifications: [], unreadCount: 0 }
 }
 
 function formatRelativeTime(isoString: string): string {

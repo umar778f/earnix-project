@@ -322,14 +322,14 @@ export function IngestionWizard() {
             </div>
           </div>
 
-          {/* Sample Statement Loader (FYP Evaluator Assistance) */}
+          {/* Sample Statement Templates */}
           <div className="rounded-xl border border-blue-500/20 bg-blue-50/50 p-4 text-xs dark:border-blue-500/30 dark:bg-blue-950/20 space-y-2.5">
             <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold">
               <Sparkles className="size-4 text-blue-600 dark:text-blue-400" />
-              <span>FYP Evaluation &amp; Demonstration Samples</span>
+              <span>Statement Templates &amp; Example Formats</span>
             </div>
             <p className="text-[11px] text-blue-800/90 dark:text-blue-300/80 leading-relaxed">
-              Don&apos;t have an Upwork statement on hand? Click either button below to instantly load a verified academic sample containing real-world fixed price milestones, hourly contracts, service fee deductions, and withdrawal lines.
+              Want to test statement ingestion before connecting your account? Load a formatted Upwork statement or generic invoice template to preview the multi-currency reconciliation workflow.
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <Button
@@ -340,7 +340,7 @@ export function IngestionWizard() {
                 className="gap-1.5 text-xs bg-background"
               >
                 <FileSpreadsheet className="size-3" />
-                <span>Load Sample Upwork Statement (9 Rows)</span>
+                <span>Load Example Upwork Statement (9 Rows)</span>
               </Button>
               <Button
                 type="button"
@@ -350,7 +350,7 @@ export function IngestionWizard() {
                 className="gap-1.5 text-xs bg-background"
               >
                 <FileText className="size-3" />
-                <span>Load Sample Direct Client Invoices</span>
+                <span>Load Example Direct Client Invoices</span>
               </Button>
             </div>
           </div>

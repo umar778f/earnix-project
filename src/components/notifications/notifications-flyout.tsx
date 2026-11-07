@@ -5,7 +5,6 @@ import { useTransition } from "react"
 import Link from "next/link"
 import {
   type NotificationItem,
-  DEMO_NOTIFICATIONS,
 } from "@/lib/notifications/types"
 import {
   markNotificationAsReadAction,
@@ -31,7 +30,7 @@ interface NotificationsFlyoutProps {
 }
 
 export function NotificationsFlyout({
-  initialNotifications = DEMO_NOTIFICATIONS,
+  initialNotifications = [],
 }: NotificationsFlyoutProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [notifications, setNotifications] = React.useState<NotificationItem[]>(initialNotifications)

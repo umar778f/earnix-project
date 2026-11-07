@@ -21,7 +21,7 @@ export function RecentTransactionsFeed({
       case "manual":
         return { label: "Manual Entry", bg: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20" }
       case "demo":
-        return { label: "Demo Data", bg: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" }
+        return { label: "Sample Import", bg: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" }
       default:
         return { label: "Imported", bg: "bg-muted text-muted-foreground border-border" }
     }

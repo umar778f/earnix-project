@@ -19,9 +19,6 @@ export default function AuthLayout({
             <Sparkles className="size-4" />
           </div>
           <span className="text-base font-bold">Earnix</span>
-          <span className="text-[10px] font-mono uppercase bg-muted text-muted-foreground px-1.5 py-0.5 rounded border border-border">
-            FYP
-          </span>
         </Link>
         <ThemeToggle />
       </header>

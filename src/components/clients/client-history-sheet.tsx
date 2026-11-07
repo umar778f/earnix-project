@@ -46,11 +46,6 @@ export function ClientHistorySheet({
               <span className="text-[10px] font-mono uppercase bg-muted px-2 py-0.5 rounded border border-border">
                 Client Profile
               </span>
-              {client.isDemo && (
-                <span className="text-[10px] font-mono text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                  Demo Fixture
-                </span>
-              )}
             </div>
             <SheetTitle className="text-xl font-bold">{client.name}</SheetTitle>
             <SheetDescription>

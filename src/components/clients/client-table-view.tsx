@@ -25,14 +25,12 @@ interface ClientTableViewProps {
   initialClients: ClientListItem[]
   platforms: { id: string; code: string; name: string }[]
   baseCurrency: string
-  isDemoData: boolean
 }
 
 export function ClientTableView({
   initialClients,
   platforms,
   baseCurrency,
-  isDemoData,
 }: ClientTableViewProps) {
   const [search, setSearch] = React.useState("")
   const [platformFilter, setPlatformFilter] = React.useState("all")
@@ -193,11 +191,6 @@ export function ClientTableView({
                         <div className="space-y-0.5">
                           <p className="font-semibold text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5">
                             <span>{client.name}</span>
-                            {client.isDemo && (
-                              <span className="text-[9px] font-mono text-amber-600 bg-amber-500/10 px-1 rounded border border-amber-500/20">
-                                Demo
-                              </span>
-                            )}
                           </p>
                           {client.email && (
                             <p className="text-[11px] text-muted-foreground truncate max-w-[200px]">
@@ -247,36 +240,32 @@ export function ClientTableView({
                             <ExternalLink className="size-3.5" />
                           </Button>
 
-                          {!isDemoData && (
-                            <>
-                              <Button
-                                variant="ghost"
-                                size="icon-xs"
-                                onClick={(e) => handleOpenEdit(client, e)}
-                                className="text-muted-foreground hover:text-foreground"
-                                aria-label={`Edit ${client.name}`}
-                                title="Edit client"
-                              >
-                                <Edit2 className="size-3.5" />
-                              </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            onClick={(e) => handleOpenEdit(client, e)}
+                            className="text-muted-foreground hover:text-foreground"
+                            aria-label={`Edit ${client.name}`}
+                            title="Edit client"
+                          >
+                            <Edit2 className="size-3.5" />
+                          </Button>
 
-                              <Button
-                                variant="ghost"
-                                size="icon-xs"
-                                disabled={isDeleting}
-                                onClick={(e) => handleDelete(client.id, client.name, e)}
-                                className="text-muted-foreground hover:text-destructive"
-                                aria-label={`Delete ${client.name}`}
-                                title="Delete client"
-                              >
-                                {isDeleting ? (
-                                  <Loader2 className="size-3.5 animate-spin" />
-                                ) : (
-                                  <Trash2 className="size-3.5" />
-                                )}
-                              </Button>
-                            </>
-                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            disabled={isDeleting}
+                            onClick={(e) => handleDelete(client.id, client.name, e)}
+                            className="text-muted-foreground hover:text-destructive"
+                            aria-label={`Delete ${client.name}`}
+                            title="Delete client"
+                          >
+                            {isDeleting ? (
+                              <Loader2 className="size-3.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="size-3.5" />
+                            )}
+                          </Button>
                         </div>
                       </td>
                     </tr>

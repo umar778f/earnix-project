@@ -1,13 +1,12 @@
 # Earnix
 
-**AI-powered Freelancer Income Management, Financial Recordkeeping and Tax Preparation Platform**  
-*Final Year Project (FYP)*
+**AI-Powered Freelancer Income Management, Financial Recordkeeping and Tax Preparation Platform**
 
 ---
 
 ## 1. Overview
 
-Earnix is a specialized web-based financial management platform designed specifically for freelancers. Online freelancers often receive payments across disparate platforms (Upwork, direct clients) in foreign currencies (USD, EUR, GBP) and need to maintain accurate, audit-ready records to simplify income tracking, expense management, and annual tax preparation.
+Earnix is a specialized web-based financial management platform designed specifically for freelancers, consultants, and independent contractors. Freelancers receive payments across disparate platforms (Upwork, direct client contracts) in foreign currencies (USD, EUR, GBP) and need to maintain accurate, audit-ready records to simplify income tracking, expense management, and annual tax preparation.
 
 > **Disclaimer:** Earnix provides financial record organization, expense deduplication, and tax estimation assistance for the user and their qualified tax accountant. It does not act as an official tax authority and does not provide certified legal counsel.
 
@@ -24,14 +23,14 @@ Earnix is a specialized web-based financial management platform designed specifi
 
 ## 3. Technology Stack
 
-- **Frontend:** Next.js 15 (App Router, React 19, Server Components)
+- **Frontend:** Next.js 16 (App Router, React 19, Server Components)
 - **Language:** TypeScript (strict mode, zero `any`)
 - **Styling:** Tailwind CSS + shadcn/ui
 - **Icons:** Lucide React
 - **Precision Arithmetic:** `decimal.js`
 - **Data Validation:** Zod
 - **Backend / Database:** Supabase (PostgreSQL 16, Supabase Auth, Supabase Storage)
-- **AI Engine (Phases 11–12):** Gemini API (Structured Outputs)
+- **AI Engine:** Gemini API (Structured Outputs)
 - **Deployment:** Vercel
 
 ---
@@ -83,8 +82,8 @@ Earnix is a specialized web-based financial management platform designed specifi
 - [x] **Phase 12:** AI Financial Assistant — Earnix Copilot (`/copilot`) with Deterministic RAG Grounding
 - [x] **Phase 13:** Tax Preparation Center (`/tax`) with FBR Section 154A IT Benchmark & 1-Click Accountant CSV Export
 - [x] **Phase 14:** Real-time Notifications & Quarterly Tax Reminders Flyout
-- [x] **Phase 15:** Multi-Tenant Security Audits, Row Level Security Verification & 32-Point Automated Test Suite
-- [x] **Phase 16:** Vercel Production Build Readiness & University FYP Demonstration Walkthrough Suite
+- [x] **Phase 15:** Multi-Tenant Security Audits, Row Level Security Verification & 35-Point Automated Test Suite
+- [x] **Phase 16:** Commercialization, Security Hardening & Production Operations Suite
 
 ---
 
@@ -93,7 +92,7 @@ Earnix is a specialized web-based financial management platform designed specifi
 Run the automated test verification suite covering financial precision, currency conversion, tax engine edge cases, statement parsers, and security boundaries:
 
 ```bash
-npm run test:phase15
+npm test
 ```
 
 Build the production application:
@@ -105,6 +104,6 @@ npm run lint
 
 ---
 
-## 7. University FYP Demonstration Walkthrough
+## 7. Platform Architecture & Product Walkthrough
 
-For evaluators and academic reviewers, refer to [DEMO_WALKTHROUGH.md](file:///d:/Earnix/DEMO_WALKTHROUGH.md) for a structured 10-minute presentation guide, interactive evaluation scenarios, and architectural defense Q&A.
+For an in-depth operational guide, evaluation scenarios, and technical architectural details, refer to [PRODUCT_WALKTHROUGH.md](PRODUCT_WALKTHROUGH.md).

@@ -22,7 +22,6 @@ import {
   CheckCircle2,
   Trash2,
   Pencil,
-  Info,
   Sparkles,
 } from "lucide-react"
 
@@ -99,19 +98,6 @@ export function ExpenseTableView({ summary, receiptOptions }: ExpenseTableViewPr
 
   return (
     <div className="space-y-6">
-      {/* Demo Notice Banner if Demo Mode */}
-      {summary.isDemoData && (
-        <div className="flex items-start gap-3 rounded-xl border border-blue-500/20 bg-blue-50/50 p-4 text-xs text-blue-900 dark:border-blue-500/30 dark:bg-blue-950/20 dark:text-blue-300">
-          <Info className="size-4 shrink-0 mt-0.5 text-blue-600 dark:text-blue-400" />
-          <div className="space-y-1">
-            <span className="font-semibold">[FYP Demo Mode] Realistic Academic Expense Fixtures</span>
-            <p className="text-[11px] leading-relaxed text-blue-800/90 dark:text-blue-300/80">
-              Displaying simulated freelancer operational expenses (cloud servers, IDE licenses, high-speed internet, hardware peripherals) with tax-deductibility classifications and attached receipts.
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* KPI Cards Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="rounded-xl border border-border bg-card p-4 shadow-xs space-y-1">

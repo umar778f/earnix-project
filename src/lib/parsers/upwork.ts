@@ -229,7 +229,7 @@ function parseUpworkDate(dateStr: string): string {
 }
 
 /**
- * Pre-configured realistic Upwork CSV Statement fixture for FYP Demonstration
+ * Pre-configured realistic Upwork CSV Statement template for testing ingestion
  */
 export const SAMPLE_UPWORK_CSV = `Date,Ref ID,Type,Description,Agency,Freelancer,Team,Account Name,Amount,Currency
 Nov 2 2026,98240182,Fixed Price,Invoice for Milestone 3: Next.js SaaS Architecture & API Implementation,,Umar,,Acme Cloud Solutions,1800.00,USD

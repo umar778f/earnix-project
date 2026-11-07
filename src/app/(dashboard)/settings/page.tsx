@@ -13,8 +13,8 @@ export const metadata = {
 export default async function SettingsPage() {
   let defaultCurrency = "USD"
   let taxJurisdiction = "PK"
-  let fullName = "Freelancer"
-  let email = "demo@earnix.local"
+  let fullName = "Active Account"
+  let email = "user@earnix.app"
 
   if (isSupabaseConfigured()) {
     try {

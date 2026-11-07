@@ -56,7 +56,7 @@ export function TransactionDetailSheet({
       case "manual":
         return { label: "Manual Freelancer Entry", bg: "bg-slate-500/10 text-slate-600 dark:text-slate-400" }
       case "demo":
-        return { label: "University Demo Fixture", bg: "bg-amber-500/10 text-amber-600 dark:text-amber-400" }
+        return { label: "Sample Import", bg: "bg-amber-500/10 text-amber-600 dark:text-amber-400" }
       default:
         return { label: "Imported Record", bg: "bg-muted text-muted-foreground" }
     }

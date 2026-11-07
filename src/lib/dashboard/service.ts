@@ -22,12 +22,98 @@ interface JoinedClient {
   country?: string | null
 }
 
+const STATIC_ZERO_MONTHS: MonthlyTrendItem[] = [
+  { month: "Period 1", income: 0, expenses: 0, net: 0 },
+  { month: "Period 2", income: 0, expenses: 0, net: 0 },
+  { month: "Period 3", income: 0, expenses: 0, net: 0 },
+  { month: "Period 4", income: 0, expenses: 0, net: 0 },
+  { month: "Period 5", income: 0, expenses: 0, net: 0 },
+  { month: "Current", income: 0, expenses: 0, net: 0 },
+]
+
+export function computeDynamicMonthlyTrends(
+  transactions: { payment_date: string; converted_amount: number | string; status: string }[] = [],
+  expenses: { expense_date: string; converted_amount: number | string }[] = [],
+  referenceDate?: Date
+): MonthlyTrendItem[] {
+  if (transactions.length === 0 && expenses.length === 0) {
+    return STATIC_ZERO_MONTHS
+  }
+
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+  const trends: MonthlyTrendItem[] = []
+  const now = referenceDate || new Date()
+
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const y = d.getFullYear()
+    const m = d.getMonth()
+    const label = `${monthNames[m]} ${y}`
+
+    let monthIncome = toDecimal(0)
+    for (const tx of transactions) {
+      if (tx.status === "completed") {
+        const txDate = new Date(tx.payment_date)
+        if (txDate.getFullYear() === y && txDate.getMonth() === m) {
+          monthIncome = addDecimals(monthIncome, toDecimal(tx.converted_amount))
+        }
+      }
+    }
+
+    let monthExpense = toDecimal(0)
+    for (const exp of expenses) {
+      const expDate = new Date(exp.expense_date)
+      if (expDate.getFullYear() === y && expDate.getMonth() === m) {
+        monthExpense = addDecimals(monthExpense, toDecimal(exp.converted_amount))
+      }
+    }
+
+    const net = subtractDecimals(monthIncome, monthExpense)
+
+    trends.push({
+      month: label,
+      income: monthIncome.toNumber(),
+      expenses: monthExpense.toNumber(),
+      net: net.toNumber(),
+    })
+  }
+
+  return trends
+}
+
+export function createEmptyDashboard(baseCurrency: string = "USD"): DashboardData {
+  return {
+    isDemoData: false,
+    baseCurrency,
+    totalGrossIncome: 0,
+    monthlyIncome: 0,
+    yearlyIncome: 0,
+    totalExpenses: 0,
+    netIncome: 0,
+    estimatedTaxReserve: 0,
+    estimatedTaxRate: 1.0,
+    recentTransactions: [],
+    topClients: [],
+    monthlyTrends: STATIC_ZERO_MONTHS,
+    platformDistribution: [],
+    currencyDistribution: [],
+    transactionCount: 0,
+    expenseCount: 0,
+    unreadNotificationsCount: 0,
+  }
+}
+
 export async function getDashboardData(options?: {
   preferDemo?: boolean
 }): Promise<DashboardData> {
-  // If explicitly requested or Supabase is not configured, return demo fixtures
-  if (options?.preferDemo || !isSupabaseConfigured()) {
+  // If explicitly requested via options, return demo fixtures
+  if (options?.preferDemo) {
     return DEMO_DASHBOARD_DATA
+  }
+
+  // If Supabase is not configured, return an authentic clean zero-state dashboard
+  if (!isSupabaseConfigured()) {
+    return createEmptyDashboard("USD")
   }
 
   try {
@@ -37,7 +123,7 @@ export async function getDashboardData(options?: {
     } = await supabase.auth.getUser()
 
     if (!user) {
-      return DEMO_DASHBOARD_DATA
+      return createEmptyDashboard("USD")
     }
 
     // Query user profile
@@ -92,13 +178,8 @@ export async function getDashboardData(options?: {
       .eq("user_id", user.id)
       .eq("is_read", false)
 
-    // If user has zero transactions, return the verified demo dataset for demonstration
-    if (!transactions || transactions.length === 0) {
-      return {
-        ...DEMO_DASHBOARD_DATA,
-        baseCurrency,
-      }
-    }
+    const rawTransactions = transactions || []
+    const rawExpenses = expenses || []
 
     const now = new Date()
     const currentYearNum = now.getFullYear()
@@ -114,7 +195,7 @@ export async function getDashboardData(options?: {
 
     const mappedTransactions: DashboardTransactionItem[] = []
 
-    for (const tx of transactions) {
+    for (const tx of rawTransactions) {
       const amountDec = toDecimal(tx.converted_amount)
       const txDate = new Date(tx.payment_date)
 
@@ -186,10 +267,8 @@ export async function getDashboardData(options?: {
 
     // Expenses aggregation
     let totalExpensesDec = toDecimal(0)
-    if (expenses && expenses.length > 0) {
-      for (const exp of expenses) {
-        totalExpensesDec = addDecimals(totalExpensesDec, toDecimal(exp.converted_amount))
-      }
+    for (const exp of rawExpenses) {
+      totalExpensesDec = addDecimals(totalExpensesDec, toDecimal(exp.converted_amount))
     }
 
     const netIncomeDec = subtractDecimals(grossDec, totalExpensesDec)
@@ -227,8 +306,8 @@ export async function getDashboardData(options?: {
         contractCount: c.count,
       }))
 
-    // 6-month trends
-    const monthlyTrends: MonthlyTrendItem[] = DEMO_DASHBOARD_DATA.monthlyTrends
+    // Dynamic monthly trend calculated from user data
+    const monthlyTrends: MonthlyTrendItem[] = computeDynamicMonthlyTrends(rawTransactions, rawExpenses)
 
     return {
       isDemoData: false,
@@ -245,12 +324,11 @@ export async function getDashboardData(options?: {
       monthlyTrends,
       platformDistribution,
       currencyDistribution,
-      transactionCount: transactions.length,
-      expenseCount: expenses?.length || 0,
+      transactionCount: rawTransactions.length,
+      expenseCount: rawExpenses.length,
       unreadNotificationsCount: unreadCount || 0,
     }
   } catch {
-    // Return demo fixtures on any query exception
-    return DEMO_DASHBOARD_DATA
+    return createEmptyDashboard("USD")
   }
 }

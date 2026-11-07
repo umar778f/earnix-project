@@ -74,7 +74,7 @@ Return ONLY valid JSON matching this exact structure:
     }
   }
 
-  // Heuristic rule-based taxonomy classifier (FYP Offline & Resilience Guarantee)
+  // Heuristic rule-based taxonomy classifier (Offline & Resilience Fallback)
   return classifyIncomeHeuristically(id, description, clientName, currentCategory)
 }
 

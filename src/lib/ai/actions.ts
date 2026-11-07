@@ -7,8 +7,6 @@ import {
   classifyExpenseRecord,
   type CategorizationSuggestion,
 } from "@/lib/ai/categorizer"
-import { DEMO_TRANSACTIONS_LIST } from "@/lib/transactions/service"
-import { DEMO_EXPENSES } from "@/lib/expenses/service"
 
 export type AiActionResult<T = unknown> = {
   success: boolean
@@ -100,23 +98,9 @@ export async function runAiTransactionCategorizationAction(): Promise<
     }
   }
 
-  // Demo / guest fallback
-  const suggestions: CategorizationSuggestion[] = []
-  for (const tx of DEMO_TRANSACTIONS_LIST.slice(0, 3)) {
-    const s = await classifyIncomeTransaction(
-      tx.id,
-      tx.description,
-      tx.clientName,
-      tx.originalAmount,
-      tx.category
-    )
-    suggestions.push(s)
-  }
-
-  revalidatePath("/transactions")
   return {
     success: true,
-    data: { count: suggestions.length, suggestions },
+    data: { count: 0, suggestions: [] },
   }
 }
 
@@ -279,21 +263,10 @@ export async function runAiExpenseCategorizationAction(): Promise<
     }
   }
 
-  // Demo fallback
-  const suggestions: CategorizationSuggestion[] = []
-  for (const exp of DEMO_EXPENSES.slice(0, 3)) {
-    const s = await classifyExpenseRecord(
-      exp.id,
-      exp.title,
-      exp.originalAmount,
-      exp.category,
-      exp.notes || undefined
-    )
-    suggestions.push(s)
+  return {
+    success: true,
+    data: { count: 0, suggestions: [] },
   }
-
-  revalidatePath("/expenses")
-  return { success: true, data: { count: suggestions.length, suggestions } }
 }
 
 /**

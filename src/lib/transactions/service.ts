@@ -259,11 +259,11 @@ export const DEMO_PLATFORMS_OPTIONS = [
   { id: "00000000-0000-0000-0000-000000000001", code: "upwork", name: "Upwork" },
   { id: "00000000-0000-0000-0000-000000000002", code: "generic_csv", name: "Generic CSV Import" },
   { id: "00000000-0000-0000-0000-000000000003", code: "manual", name: "Manual Entry" },
-  { id: "00000000-0000-0000-0000-000000000004", code: "demo", name: "Demo Mode" },
+  { id: "00000000-0000-0000-0000-000000000004", code: "direct", name: "Direct Client" },
 ]
 
 export async function getTransactionsData(options?: { preferDemo?: boolean }): Promise<TransactionsPageData> {
-  if (options?.preferDemo || !isSupabaseConfigured()) {
+  if (options?.preferDemo) {
     let grossDec = toDecimal(0)
     let completed = 0
     let pending = 0
@@ -285,7 +285,20 @@ export async function getTransactionsData(options?: { preferDemo?: boolean }): P
       totalConvertedGross: grossDec.toNumber(),
       completedCount: completed,
       pendingCount: pending,
-      isDemoData: true,
+      isDemoData: false,
+    }
+  }
+
+  if (!isSupabaseConfigured()) {
+    return {
+      transactions: [],
+      clients: [],
+      platforms: DEMO_PLATFORMS_OPTIONS,
+      baseCurrency: "USD",
+      totalConvertedGross: 0,
+      completedCount: 0,
+      pendingCount: 0,
+      isDemoData: false,
     }
   }
 
@@ -296,7 +309,16 @@ export async function getTransactionsData(options?: { preferDemo?: boolean }): P
     } = await supabase.auth.getUser()
 
     if (!user) {
-      return getTransactionsData({ preferDemo: true })
+      return {
+        transactions: [],
+        clients: [],
+        platforms: DEMO_PLATFORMS_OPTIONS,
+        baseCurrency: "USD",
+        totalConvertedGross: 0,
+        completedCount: 0,
+        pendingCount: 0,
+        isDemoData: false,
+      }
     }
 
     // Query user profile
@@ -357,14 +379,14 @@ export async function getTransactionsData(options?: { preferDemo?: boolean }): P
 
     if (!transactionsData || transactionsData.length === 0) {
       return {
-        transactions: DEMO_TRANSACTIONS_LIST,
-        clients,
+        transactions: [],
+        clients: clientsData || [],
         platforms,
         baseCurrency,
-        totalConvertedGross: DEMO_TRANSACTIONS_LIST.reduce((acc, t) => t.status === "completed" ? acc + t.convertedAmount : acc, 0),
-        completedCount: DEMO_TRANSACTIONS_LIST.filter(t => t.status === "completed").length,
-        pendingCount: DEMO_TRANSACTIONS_LIST.filter(t => t.status === "pending").length,
-        isDemoData: true,
+        totalConvertedGross: 0,
+        completedCount: 0,
+        pendingCount: 0,
+        isDemoData: false,
       }
     }
 
@@ -423,6 +445,15 @@ export async function getTransactionsData(options?: { preferDemo?: boolean }): P
       isDemoData: false,
     }
   } catch {
-    return getTransactionsData({ preferDemo: true })
+    return {
+      transactions: [],
+      clients: [],
+      platforms: DEMO_PLATFORMS_OPTIONS,
+      baseCurrency: "USD",
+      totalConvertedGross: 0,
+      completedCount: 0,
+      pendingCount: 0,
+      isDemoData: false,
+    }
   }
 }

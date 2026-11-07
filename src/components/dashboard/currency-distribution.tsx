@@ -11,6 +11,14 @@ export function CurrencyDistribution({
   distribution,
   baseCurrency,
 }: CurrencyDistributionProps) {
+  if (!distribution || distribution.length === 0) {
+    return (
+      <div className="py-6 text-center text-xs text-muted-foreground">
+        No multi-currency income recorded yet.
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-3">
       {distribution.map((item, idx) => (

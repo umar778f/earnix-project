@@ -204,7 +204,7 @@ export async function getExpensesSummary(): Promise<ExpensesSummary> {
           .eq("user_id", user.id)
           .order("expense_date", { ascending: false })
 
-        if (!error && expenses && expenses.length > 0) {
+        if (!error && expenses) {
           return computeExpensesSummary(
             expenses.map((e) => {
               // Supabase join typing
@@ -237,8 +237,8 @@ export async function getExpensesSummary(): Promise<ExpensesSummary> {
     }
   }
 
-  // Academic FYP Demo Fallback
-  return computeExpensesSummary(DEMO_EXPENSES, true, "USD")
+  // Zero-state fallback
+  return computeExpensesSummary([], false, "USD")
 }
 
 function computeExpensesSummary(

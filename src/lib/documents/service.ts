@@ -139,7 +139,7 @@ export async function getDocumentsSummary(): Promise<DocumentsSummary> {
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
 
-        if (!error && docs && docs.length > 0) {
+        if (!error && docs) {
           // Generate signed download URLs in parallel
           const docsWithUrls: DocumentVaultItem[] = await Promise.all(
             docs.map(async (d) => {
@@ -176,7 +176,7 @@ export async function getDocumentsSummary(): Promise<DocumentsSummary> {
     }
   }
 
-  return computeDocumentsSummary(DEMO_DOCUMENTS, true)
+  return computeDocumentsSummary([], false)
 }
 
 export async function getUserReceiptOptions(): Promise<ReceiptOption[]> {
@@ -208,13 +208,7 @@ export async function getUserReceiptOptions(): Promise<ReceiptOption[]> {
     }
   }
 
-  return DEMO_DOCUMENTS.filter(
-    (d) => d.documentType === "receipt" || d.documentType === "invoice"
-  ).map((d) => ({
-    id: d.id,
-    fileName: d.fileName,
-    documentType: d.documentType,
-  }))
+  return []
 }
 
 function computeDocumentsSummary(

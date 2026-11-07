@@ -256,7 +256,7 @@ export function CopilotChat() {
       {messages.length <= 2 && (
         <div className="px-4 py-2 border-t border-border/60 bg-muted/10 space-y-1.5">
           <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-            Suggested FYP Demo Questions:
+            Suggested Inquiries:
           </span>
           <div className="flex flex-wrap gap-1.5">
             {SUGGESTED_PROMPTS.map((prompt, i) => (

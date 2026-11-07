@@ -1,5 +1,5 @@
 /**
- * EARNIX — PHASE 15 AUTOMATED VERIFICATION SUITE
+ * EARNIX — AUTOMATED PRODUCTION VERIFICATION SUITE
  * 
  * Comprehensive tests covering:
  * 1. Financial Precision & Decimal.js Non-Floating Point Arithmetic

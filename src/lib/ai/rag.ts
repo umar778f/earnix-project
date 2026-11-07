@@ -257,7 +257,7 @@ ${verifiedContext}`
     }
   }
 
-  // Deterministic Fallback Response (Guaranteed Offline / FYP Demonstration Resilience)
+  // Deterministic Fallback Response (Guaranteed Offline Resilience)
   let fallbackAnswer = ""
 
   if (isUpworkSpecific) {

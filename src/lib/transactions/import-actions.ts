@@ -100,10 +100,6 @@ export async function reconcileImportRowsAction(
     } catch {
       // Fallback
     }
-  } else {
-    // In demo mode, mark specific known demo refs as existing
-    existingRefIds.add("98240182")
-    existingRefIds.add("UP-2026-10492")
   }
 
   let totalGrossDec = new Decimal(0)
@@ -403,7 +399,7 @@ export async function commitImportBatchAction(
     }
   }
 
-  // Demo / guest fallback
+  // Guest / preview fallback
   revalidatePath("/transactions")
   revalidatePath("/dashboard")
   const totalGross = incomeRows.reduce((acc, r) => acc + r.convertedAmount, 0)
@@ -411,7 +407,7 @@ export async function commitImportBatchAction(
     success: true,
     importedTransactionsCount: incomeRows.length,
     importedFeesCount: importFeesAsExpenses ? feeRows.length : 0,
-    createdClientsCount: 2,
+    createdClientsCount: new Set(incomeRows.map((r) => r.clientName).filter(Boolean)).size,
     totalGrossImported: Number(totalGross.toFixed(2)),
     baseCurrency: "USD",
   }

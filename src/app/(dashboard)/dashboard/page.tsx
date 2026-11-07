@@ -10,7 +10,6 @@ import { PlatformDistribution } from "@/components/dashboard/platform-distributi
 import { CurrencyDistribution } from "@/components/dashboard/currency-distribution"
 import { RecentTransactionsFeed } from "@/components/dashboard/recent-transactions-feed"
 import { TopClientsCard } from "@/components/dashboard/top-clients-card"
-import { DemoNoticeBanner } from "@/components/dashboard/demo-notice-banner"
 import { UploadCloud, FileText, ArrowRight } from "lucide-react"
 
 export const metadata = {
@@ -43,9 +42,6 @@ export default async function DashboardPage() {
           <span>Tax Records</span>
         </Link>
       </PageHeader>
-
-      {/* Demo Fixtures Notice (When in demo mode or initial evaluation) */}
-      {data.isDemoData && <DemoNoticeBanner />}
 
       {/* Primary KPI Metrics Grid */}
       <MetricsGrid

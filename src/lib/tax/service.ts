@@ -29,8 +29,8 @@ export async function getTaxPreparationSummary(
 
   let estimatedRate = SUPPORTED_TAX_JURISDICTIONS[requestedJurisdiction]?.defaultRate || 1.0
   let withholdingSuffered = 0
-  let businessName: string | null = "Earnix Software Services"
-  let taxIdentifier: string | null = "NTN: 8492019-3"
+  let businessName: string | null = null
+  let taxIdentifier: string | null = null
   let baseCurrency = txData.baseCurrency || "USD"
 
   if (isSupabaseConfigured()) {

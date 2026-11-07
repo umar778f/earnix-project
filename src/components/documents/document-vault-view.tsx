@@ -19,7 +19,6 @@ import {
   FileImage,
   Trash2,
   ExternalLink,
-  Info,
   HardDrive,
   Receipt,
   FileCheck,
@@ -55,7 +54,7 @@ export function DocumentVaultView({ summary }: DocumentVaultViewProps) {
     if (doc.signedUrl) {
       window.open(doc.signedUrl, "_blank", "noopener,noreferrer")
     } else {
-      alert(`[Demo Mode] Viewing "${doc.fileName}". In live deployment, this opens an authenticated Supabase Storage signed URL preview.`)
+      alert(`Preview URL is currently unavailable for "${doc.fileName}". Please refresh the page.`)
     }
   }
 
@@ -89,19 +88,6 @@ export function DocumentVaultView({ summary }: DocumentVaultViewProps) {
 
   return (
     <div className="space-y-6">
-      {/* Demo Banner */}
-      {summary.isDemoData && (
-        <div className="flex items-start gap-3 rounded-xl border border-blue-500/20 bg-blue-50/50 p-4 text-xs text-blue-900 dark:border-blue-500/30 dark:bg-blue-950/20 dark:text-blue-300">
-          <Info className="size-4 shrink-0 mt-0.5 text-blue-600 dark:text-blue-400" />
-          <div className="space-y-1">
-            <span className="font-semibold">[FYP Demo Mode] Verified Financial Documents Vault</span>
-            <p className="text-[11px] leading-relaxed text-blue-800/90 dark:text-blue-300/80">
-              Demonstrating secure storage for PDF invoices, payment proofs, and tax certificates backed by Supabase Storage RLS policies and OCR data extraction pipelines.
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* KPI Cards Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="rounded-xl border border-border bg-card p-4 shadow-xs space-y-1">

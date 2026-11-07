@@ -8,6 +8,14 @@ interface PlatformDistributionProps {
 }
 
 export function PlatformDistribution({ distribution, baseCurrency }: PlatformDistributionProps) {
+  if (!distribution || distribution.length === 0) {
+    return (
+      <div className="py-6 text-center text-xs text-muted-foreground">
+        No platform earnings recorded yet. Ingest statements or record a payment to see platform breakdown.
+      </div>
+    )
+  }
+
   const getIcon = (code: string) => {
     switch (code) {
       case "upwork":

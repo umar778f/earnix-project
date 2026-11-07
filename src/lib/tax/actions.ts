@@ -67,7 +67,7 @@ export async function updateTaxConfigAction(input: TaxConfigInput): Promise<TaxA
     }
   }
 
-  // Demo fallback
+  // Guest / offline fallback
   revalidatePath("/tax")
   return { success: true }
 }

@@ -33,7 +33,6 @@ interface TransactionTableViewProps {
   clients: { id: string; name: string }[]
   platforms: { id: string; code: string; name: string }[]
   baseCurrency: string
-  isDemoData: boolean
 }
 
 export function TransactionTableView({
@@ -41,7 +40,6 @@ export function TransactionTableView({
   clients,
   platforms,
   baseCurrency,
-  isDemoData,
 }: TransactionTableViewProps) {
   // Filters state
   const [search, setSearch] = React.useState("")
@@ -141,7 +139,7 @@ export function TransactionTableView({
       case "manual":
         return { label: "Manual Entry", bg: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20" }
       case "demo":
-        return { label: "Demo Data", bg: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" }
+        return { label: "Sample Import", bg: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" }
       default:
         return { label: "Ledger", bg: "bg-muted text-muted-foreground border-border" }
     }
@@ -443,36 +441,32 @@ export function TransactionTableView({
                             <ExternalLink className="size-3.5" />
                           </Button>
 
-                          {!isDemoData && (
-                            <>
-                              <Button
-                                variant="ghost"
-                                size="icon-xs"
-                                onClick={(e) => handleOpenEdit(tx, e)}
-                                className="text-muted-foreground hover:text-foreground"
-                                aria-label="Edit transaction"
-                                title="Edit transaction"
-                              >
-                                <Edit2 className="size-3.5" />
-                              </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            onClick={(e) => handleOpenEdit(tx, e)}
+                            className="text-muted-foreground hover:text-foreground"
+                            aria-label="Edit transaction"
+                            title="Edit transaction"
+                          >
+                            <Edit2 className="size-3.5" />
+                          </Button>
 
-                              <Button
-                                variant="ghost"
-                                size="icon-xs"
-                                disabled={isDeleting}
-                                onClick={(e) => handleDelete(tx.id, tx.description, e)}
-                                className="text-muted-foreground hover:text-destructive"
-                                aria-label="Delete transaction"
-                                title="Delete transaction"
-                              >
-                                {isDeleting ? (
-                                  <Loader2 className="size-3.5 animate-spin" />
-                                ) : (
-                                  <Trash2 className="size-3.5" />
-                                )}
-                              </Button>
-                            </>
-                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            disabled={isDeleting}
+                            onClick={(e) => handleDelete(tx.id, tx.description, e)}
+                            className="text-muted-foreground hover:text-destructive"
+                            aria-label="Delete transaction"
+                            title="Delete transaction"
+                          >
+                            {isDeleting ? (
+                              <Loader2 className="size-3.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="size-3.5" />
+                            )}
+                          </Button>
                         </div>
                       </td>
                     </tr>

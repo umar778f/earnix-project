@@ -105,16 +105,25 @@ export const DEMO_PLATFORMS = [
   { id: "00000000-0000-0000-0000-000000000001", code: "upwork", name: "Upwork" },
   { id: "00000000-0000-0000-0000-000000000002", code: "generic_csv", name: "Generic CSV Import" },
   { id: "00000000-0000-0000-0000-000000000003", code: "manual", name: "Direct Client / Manual" },
-  { id: "00000000-0000-0000-0000-000000000004", code: "demo", name: "Demo Mode" },
+  { id: "00000000-0000-0000-0000-000000000004", code: "direct", name: "Direct Contract" },
 ]
 
 export async function getClientsData(options?: { preferDemo?: boolean }): Promise<ClientsPageData> {
-  if (options?.preferDemo || !isSupabaseConfigured()) {
+  if (options?.preferDemo) {
     return {
       clients: DEMO_CLIENTS_LIST,
       platforms: DEMO_PLATFORMS,
       baseCurrency: "USD",
-      isDemoData: true,
+      isDemoData: false,
+    }
+  }
+
+  if (!isSupabaseConfigured()) {
+    return {
+      clients: [],
+      platforms: DEMO_PLATFORMS,
+      baseCurrency: "USD",
+      isDemoData: false,
     }
   }
 
@@ -126,10 +135,10 @@ export async function getClientsData(options?: { preferDemo?: boolean }): Promis
 
     if (!user) {
       return {
-        clients: DEMO_CLIENTS_LIST,
+        clients: [],
         platforms: DEMO_PLATFORMS,
         baseCurrency: "USD",
-        isDemoData: true,
+        isDemoData: false,
       }
     }
 
@@ -168,10 +177,10 @@ export async function getClientsData(options?: { preferDemo?: boolean }): Promis
 
     if (!clientsData || clientsData.length === 0) {
       return {
-        clients: DEMO_CLIENTS_LIST,
+        clients: [],
         platforms,
         baseCurrency,
-        isDemoData: true,
+        isDemoData: false,
       }
     }
 
@@ -233,10 +242,10 @@ export async function getClientsData(options?: { preferDemo?: boolean }): Promis
     }
   } catch {
     return {
-      clients: DEMO_CLIENTS_LIST,
+      clients: [],
       platforms: DEMO_PLATFORMS,
       baseCurrency: "USD",
-      isDemoData: true,
+      isDemoData: false,
     }
   }
 }
