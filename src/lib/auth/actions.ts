@@ -88,10 +88,12 @@ export async function signUpWithEmailAction(
   }
 
   const supabase = await createClient()
+  const origin = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
+      emailRedirectTo: `${origin}/auth/callback`,
       data: {
         full_name: parsed.data.fullName,
       },
