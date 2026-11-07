@@ -17,7 +17,9 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { signInWithEmailAction, type AuthActionResult } from "@/lib/auth/actions"
-import { AlertCircle, ArrowRight, Loader2 } from "lucide-react"
+import { AlertCircle, ArrowRight, Loader2, LogIn, UserPlus } from "lucide-react"
+import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 function LoginForm() {
   const router = useRouter()
@@ -38,11 +40,14 @@ function LoginForm() {
   )
 
   return (
-    <Card className="border-border shadow-sm">
+    <Card className="border-border shadow-xs">
       <CardHeader className="space-y-1.5 text-center">
-        <CardTitle className="text-xl">Sign in to Earnix</CardTitle>
+        <p className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+          Freelance Income &amp; Tax Operations
+        </p>
+        <CardTitle className="text-xl font-bold">Enter here</CardTitle>
         <CardDescription>
-          Enter your email and password to access your financial records
+          Sign in to access your financial records and ledger
         </CardDescription>
       </CardHeader>
 
@@ -97,7 +102,7 @@ function LoginForm() {
 
           <Button
             type="submit"
-            className="w-full gap-2 cursor-pointer"
+            className="w-full gap-2 cursor-pointer font-semibold shadow-xs"
             disabled={isPending}
           >
             {isPending ? (
@@ -107,24 +112,24 @@ function LoginForm() {
               </>
             ) : (
               <>
-                <span>Sign in</span>
-                <ArrowRight className="size-4" />
+                <LogIn className="size-4" />
+                <span>Enter here</span>
+                <ArrowRight className="size-3.5 ml-auto" />
               </>
             )}
           </Button>
         </form>
       </CardContent>
 
-      <CardFooter className="flex flex-col border-t border-border/50 pt-4 text-center text-xs text-muted-foreground">
-        <p>
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/signup"
-            className="font-medium text-foreground underline-offset-4 hover:underline"
-          >
-            Sign up for Earnix
-          </Link>
-        </p>
+      <CardFooter className="flex flex-col border-t border-border/60 pt-4 text-center space-y-2">
+        <p className="text-xs text-muted-foreground">New to Earnix?</p>
+        <Link
+          href="/signup"
+          className={cn(buttonVariants({ variant: "outline", size: "sm" }), "w-full gap-1.5 font-medium")}
+        >
+          <UserPlus className="size-3.5" />
+          <span>Create your account</span>
+        </Link>
       </CardFooter>
     </Card>
   )

@@ -2,6 +2,7 @@ import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { InteractiveTiltCard } from "@/components/ui/interactive-tilt-card"
 import {
   Sparkles,
   Check,
@@ -13,18 +14,19 @@ import {
   Calculator,
   ShieldCheck,
   Smartphone,
+  ArrowRight,
 } from "lucide-react"
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground antialiased">
+    <div className="min-h-screen flex flex-col bg-background text-foreground antialiased selection:bg-muted">
       {/* 1. TOP NAVIGATION */}
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-xs">
         <div className="max-w-6xl mx-auto flex h-14 items-center justify-between px-4 sm:px-6">
           {/* Brand */}
           <Link
             href="/"
-            className="flex items-center gap-2 font-semibold text-foreground tracking-tight"
+            className="flex items-center gap-2 font-semibold text-foreground tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
           >
             <div className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
               <Sparkles className="size-4" />
@@ -33,7 +35,7 @@ export default function HomePage() {
           </Link>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6 text-xs sm:text-sm text-muted-foreground">
+          <nav className="hidden md:flex items-center gap-6 text-xs sm:text-sm text-muted-foreground font-medium">
             <Link href="#features" className="hover:text-foreground transition-colors">
               Features
             </Link>
@@ -45,27 +47,27 @@ export default function HomePage() {
             </Link>
           </nav>
 
-          {/* Auth Actions */}
+          {/* Auth Action Buttons with Clear Hierarchy */}
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <Link
               href="/login"
               className={cn(
-                buttonVariants({ variant: "ghost", size: "sm" }),
-                "text-xs"
+                buttonVariants({ variant: "default", size: "sm" }),
+                "text-xs font-semibold gap-1.5 shadow-xs"
               )}
             >
-              <LogIn className="size-3.5 mr-1" />
+              <LogIn className="size-3.5" />
               <span>Enter here</span>
             </Link>
             <Link
               href="/signup"
               className={cn(
-                buttonVariants({ variant: "default", size: "sm" }),
-                "text-xs"
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "text-xs font-medium gap-1.5 hidden sm:inline-flex"
               )}
             >
-              <UserPlus className="size-3.5 mr-1" />
+              <UserPlus className="size-3.5" />
               <span>Create account</span>
             </Link>
           </div>
@@ -75,10 +77,10 @@ export default function HomePage() {
       {/* 2. HERO SECTION */}
       <section className="py-12 md:py-20 border-b border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            {/* Left Column: Product Preview */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+            {/* Left Column: Interactive 3D Product Snapshot */}
             <div className="lg:col-span-6 order-2 lg:order-1">
-              <div className="rounded-xl border border-border bg-card p-5 shadow-xs space-y-4">
+              <InteractiveTiltCard className="space-y-4">
                 {/* Header bar */}
                 <div className="flex items-center justify-between pb-3 border-b border-border/60">
                   <div>
@@ -121,7 +123,7 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Simulated Ledger Table matching RecentTransactionsFeed */}
+                {/* Simulated Ledger Records */}
                 <div className="pt-2 space-y-2">
                   <p className="text-[11px] font-medium text-muted-foreground">Recent ledger records</p>
                   <div className="space-y-1.5 text-xs">
@@ -148,13 +150,17 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </InteractiveTiltCard>
             </div>
 
-            {/* Right Column: Hero Copy */}
-            <div className="lg:col-span-6 order-1 lg:order-2 space-y-5">
+            {/* Right Column: Hero Copy & Clear Dual Action Cards */}
+            <div className="lg:col-span-6 order-1 lg:order-2 space-y-6">
               <div className="space-y-2">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
+                <div className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2.5 py-1 text-xs font-medium text-foreground border border-border/60">
+                  <Sparkles className="size-3.5 text-foreground" />
+                  <span>Freelance Income &amp; Tax Operations</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground leading-tight">
                   Financial records and tax estimates for freelancers.
                 </h1>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -163,41 +169,68 @@ export default function HomePage() {
               </div>
 
               {/* Bullet Points */}
-              <ul className="space-y-2.5 text-xs sm:text-sm text-foreground">
+              <ul className="space-y-2 text-xs sm:text-sm text-foreground">
                 <li className="flex items-start gap-2.5">
                   <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                   <span>Dual-ledger tracking with original foreign currencies and daily converted values.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span>CSV statement imports for Upwork and generic bank accounts.</span>
+                  <span>CSV statement imports for Upwork and standard bank accounts.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                   <span>Receipt attachment and proof tracking for deductible business costs.</span>
                 </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Tax reserve calculations for Section 154A (1%), IRS, and HMRC rules.</span>
-                </li>
               </ul>
 
-              {/* Action Buttons */}
-              <div className="pt-2 flex flex-wrap items-center gap-3">
-                <Link
-                  href="/signup"
-                  className={cn(buttonVariants({ variant: "default", size: "default" }))}
-                >
-                  <UserPlus className="size-4 mr-1.5" />
-                  <span>Create an account</span>
-                </Link>
-                <Link
-                  href="/login"
-                  className={cn(buttonVariants({ variant: "outline", size: "default" }))}
-                >
-                  <LogIn className="size-4 mr-1.5" />
-                  <span>Enter here</span>
-                </Link>
+              {/* High-Clarity Dual Authentication Block */}
+              <div className="rounded-xl border border-border bg-card p-4 shadow-xs space-y-3">
+                {/* Option 1: Returning users (Primary Action) */}
+                <div className="space-y-1">
+                  <Link
+                    href="/login"
+                    className={cn(
+                      buttonVariants({ variant: "default", size: "default" }),
+                      "w-full justify-between h-11 px-4 font-semibold text-sm shadow-xs cursor-pointer"
+                    )}
+                  >
+                    <span className="flex items-center gap-2">
+                      <LogIn className="size-4" />
+                      <span>Enter here</span>
+                    </span>
+                    <span className="text-xs font-normal opacity-85 flex items-center gap-1">
+                      Already have an account?
+                      <ArrowRight className="size-3.5" />
+                    </span>
+                  </Link>
+                </div>
+
+                <div className="relative flex py-1 items-center">
+                  <div className="flex-grow border-t border-border/60" />
+                  <span className="flex-shrink mx-3 text-[11px] text-muted-foreground uppercase font-mono">or</span>
+                  <div className="flex-grow border-t border-border/60" />
+                </div>
+
+                {/* Option 2: New users (Secondary Action) */}
+                <div className="space-y-1">
+                  <Link
+                    href="/signup"
+                    className={cn(
+                      buttonVariants({ variant: "outline", size: "default" }),
+                      "w-full justify-between h-11 px-4 font-medium text-sm hover:bg-muted cursor-pointer"
+                    )}
+                  >
+                    <span className="flex items-center gap-2">
+                      <UserPlus className="size-4" />
+                      <span>Create your account</span>
+                    </span>
+                    <span className="text-xs text-muted-foreground font-normal flex items-center gap-1">
+                      New here?
+                      <ArrowRight className="size-3.5" />
+                    </span>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -398,20 +431,20 @@ export default function HomePage() {
           <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto">
             Organize foreign client payments, deductible expenses, and tax records in one place.
           </p>
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/signup"
-              className={cn(buttonVariants({ variant: "default", size: "default" }))}
-            >
-              <UserPlus className="size-4 mr-1.5" />
-              <span>Create an account</span>
-            </Link>
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
             <Link
               href="/login"
-              className={cn(buttonVariants({ variant: "outline", size: "default" }))}
+              className={cn(buttonVariants({ variant: "default", size: "default" }), "w-full sm:w-auto font-semibold gap-2")}
             >
-              <LogIn className="size-4 mr-1.5" />
+              <LogIn className="size-4" />
               <span>Enter here</span>
+            </Link>
+            <Link
+              href="/signup"
+              className={cn(buttonVariants({ variant: "outline", size: "default" }), "w-full sm:w-auto font-medium gap-2")}
+            >
+              <UserPlus className="size-4" />
+              <span>Create an account</span>
             </Link>
           </div>
         </div>
@@ -424,7 +457,7 @@ export default function HomePage() {
             Earnix &copy; 2026. Financial recordkeeping for freelancers.
           </p>
           <div className="flex items-center gap-5">
-            <Link href="/login" className="hover:text-foreground transition-colors">
+            <Link href="/login" className="hover:text-foreground transition-colors font-medium text-foreground">
               Enter here
             </Link>
             <Link href="/signup" className="hover:text-foreground transition-colors">

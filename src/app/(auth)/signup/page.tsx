@@ -16,7 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { signUpWithEmailAction, type AuthActionResult } from "@/lib/auth/actions"
-import { AlertCircle, CheckCircle2, ArrowRight, Loader2 } from "lucide-react"
+import { AlertCircle, CheckCircle2, ArrowRight, Loader2, LogIn, UserPlus } from "lucide-react"
 
 export default function SignupPage() {
   const [state, formAction, isPending] = useActionState<AuthActionResult | null, FormData>(
@@ -25,11 +25,14 @@ export default function SignupPage() {
   )
 
   return (
-    <Card className="border-border shadow-sm">
+    <Card className="border-border shadow-xs">
       <CardHeader className="space-y-1.5 text-center">
-        <CardTitle className="text-xl">Create your Earnix account</CardTitle>
+        <p className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+          Freelance Income &amp; Tax Operations
+        </p>
+        <CardTitle className="text-xl font-bold">Create your account</CardTitle>
         <CardDescription>
-          Start tracking freelance income, expenses, and preparing tax records
+          Set up your multi-currency ledger in under a minute
         </CardDescription>
       </CardHeader>
 
@@ -52,9 +55,10 @@ export default function SignupPage() {
               <div className="pt-2">
                 <Link
                   href="/login"
-                  className={cn(buttonVariants({ variant: "outline", size: "xs" }))}
+                  className={cn(buttonVariants({ variant: "default", size: "sm" }), "gap-1.5")}
                 >
-                  Proceed to Login
+                  <LogIn className="size-3.5" />
+                  <span>Enter here</span>
                 </Link>
               </div>
             </div>
@@ -117,7 +121,7 @@ export default function SignupPage() {
 
             <Button
               type="submit"
-              className="w-full gap-2 cursor-pointer"
+              className="w-full gap-2 cursor-pointer font-semibold shadow-xs"
               disabled={isPending}
             >
               {isPending ? (
@@ -127,8 +131,9 @@ export default function SignupPage() {
                 </>
               ) : (
                 <>
-                  <span>Create account</span>
-                  <ArrowRight className="size-4" />
+                  <UserPlus className="size-4" />
+                  <span>Create your account</span>
+                  <ArrowRight className="size-3.5 ml-auto" />
                 </>
               )}
             </Button>
@@ -136,16 +141,15 @@ export default function SignupPage() {
         )}
       </CardContent>
 
-      <CardFooter className="flex flex-col border-t border-border/50 pt-4 text-center text-xs text-muted-foreground">
-        <p>
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="font-medium text-foreground underline-offset-4 hover:underline"
-          >
-            Sign in
-          </Link>
-        </p>
+      <CardFooter className="flex flex-col border-t border-border/60 pt-4 text-center space-y-2">
+        <p className="text-xs text-muted-foreground">Already have an account?</p>
+        <Link
+          href="/login"
+          className={cn(buttonVariants({ variant: "outline", size: "sm" }), "w-full gap-1.5 font-medium")}
+        >
+          <LogIn className="size-3.5" />
+          <span>Enter here</span>
+        </Link>
       </CardFooter>
     </Card>
   )
