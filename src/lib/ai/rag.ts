@@ -234,6 +234,7 @@ CRITICAL GROUNDING & SECURITY RULES:
 3. DO NOT invent, calculate, or hallucinate any numbers, tax rates, or balances.
 4. Be professional, concise, encouraging, and clear. Format numbers with their currency symbol.
 5. Keep the response within 2-3 concise paragraphs.
+6. DO NOT use markdown bold asterisks (**) or double stars anywhere in your answer. Output clean plain text without any asterisks.
 
 ${verifiedContext}`
 
@@ -245,7 +246,7 @@ ${verifiedContext}`
       if (response.text) {
         return {
           query: userQuery,
-          answer: response.text.trim(),
+          answer: response.text.trim().replace(/\*\*/g, ""),
           groundedMetrics,
           citations,
           deterministicModel: "gemini-2.5-flash (Grounded in Verified Ledger)",
@@ -261,37 +262,37 @@ ${verifiedContext}`
   let fallbackAnswer = ""
 
   if (isUpworkSpecific) {
-    fallbackAnswer = `Based on your verified ledger records, your total gross earnings received from **Upwork** stand at **${formatMoney(
+    fallbackAnswer = `Based on your verified ledger records, your total gross earnings received from Upwork stand at ${formatMoney(
       totalIncomeDec.toNumber(),
       baseCurrency
-    )}** across **${filteredTransactions.length}** completed contract payments. All original payment records have been audited and verified.`
+    )} across ${filteredTransactions.length} completed contract payments. All original payment records have been audited and verified.`
   } else if (isClientSpecific) {
-    fallbackAnswer = `According to your client ledger, you have earned a total of **${formatMoney(
+    fallbackAnswer = `According to your client ledger, you have earned a total of ${formatMoney(
       totalIncomeDec.toNumber(),
       baseCurrency
-    )}** from **${clientFilterName}** across **${filteredTransactions.length}** project milestones and deliverables.`
+    )} from ${clientFilterName} across ${filteredTransactions.length} project milestones and deliverables.`
   } else if (isExpenseSpecific) {
-    fallbackAnswer = `Your verified business expenditures in this category total **${formatMoney(
+    fallbackAnswer = `Your verified business expenditures in this category total ${formatMoney(
       totalExpenseDec.toNumber(),
       baseCurrency
-    )}**, of which **${formatMoney(
+    )}, of which ${formatMoney(
       deductibleExpenseDec.toNumber(),
       baseCurrency
-    )}** is flagged as allowable tax-deductible operational costs.`
+    )} is flagged as allowable tax-deductible operational costs.`
   } else {
-    fallbackAnswer = `Your verified financial position reflects **${formatMoney(
+    fallbackAnswer = `Your verified financial position reflects ${formatMoney(
       totalIncomeDec.toNumber(),
       baseCurrency
-    )}** in total gross freelance income, with **${formatMoney(
+    )} in total gross freelance income, with ${formatMoney(
       totalExpenseDec.toNumber(),
       baseCurrency
-    )}** in business expenses. This yields a net income of **${formatMoney(
+    )} in business expenses. This yields a net income of ${formatMoney(
       netIncomeDec.toNumber(),
       baseCurrency
-    )}**, with an estimated tax reserve of **${formatMoney(
+    )}, with an estimated tax reserve of ${formatMoney(
       estimatedTaxReserveDec.toNumber(),
       baseCurrency
-    )}** recommended under the 1.00% benchmark.`
+    )} recommended under the 1.00% benchmark.`
   }
 
   return {

@@ -43,7 +43,7 @@ export function CopilotChat() {
     {
       id: "welcome-msg",
       sender: "copilot",
-      text: "Hello! I am **Earnix Copilot**, your grounded financial assistant. Ask me questions about your freelance earnings, client milestones, multi-currency conversions, or tax-deductible expenses. Every answer is deterministically verified against your immutable database ledger.",
+      text: "Hello! I am Earnix Copilot, your grounded financial assistant. Ask me questions about your freelance earnings, client milestones, multi-currency conversions, or tax-deductible expenses. Every answer is deterministically verified against your immutable database ledger.",
       timestamp: "Just now",
     },
   ])
@@ -61,7 +61,7 @@ export function CopilotChat() {
   }, [messages, isPending])
 
   const handleSend = (textToSend?: string) => {
-    const query = (textToSend || inputQuery).trim()
+    const query = (textToSend || inputQuery).trim().replace(/\*\*/g, "")
     if (!query || isPending) return
 
     msgIndexRef.current += 1
@@ -85,8 +85,11 @@ export function CopilotChat() {
         const copilotMessage: ChatMessage = {
           id: copilotMsgId,
           sender: "copilot",
-          text: result.data.answer,
-          answerData: result.data,
+          text: (result.data.answer || "").replace(/\*\*/g, ""),
+          answerData: {
+            ...result.data,
+            answer: (result.data.answer || "").replace(/\*\*/g, ""),
+          },
           timestamp: "Just now",
         }
         setMessages((prev) => [...prev, copilotMessage])
@@ -94,7 +97,7 @@ export function CopilotChat() {
         const errorMsg: ChatMessage = {
           id: copilotMsgId,
           sender: "copilot",
-          text: result.error || "I could not retrieve the financial answer at this time. Please try again.",
+          text: (result.error || "I could not retrieve the financial answer at this time. Please try again.").replace(/\*\*/g, ""),
           timestamp: "Just now",
         }
         setMessages((prev) => [...prev, errorMsg])
