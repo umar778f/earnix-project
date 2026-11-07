@@ -16,7 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { signUpWithEmailAction, type AuthActionResult } from "@/lib/auth/actions"
-import { AlertCircle, CheckCircle2, ArrowRight, Loader2, Info } from "lucide-react"
+import { AlertCircle, CheckCircle2, ArrowRight, Loader2 } from "lucide-react"
 
 export default function SignupPage() {
   const [state, formAction, isPending] = useActionState<AuthActionResult | null, FormData>(
@@ -34,18 +34,6 @@ export default function SignupPage() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Setup notice if Supabase is unconfigured */}
-        <div className="rounded-lg border border-border/70 bg-muted/30 p-3 text-xs text-muted-foreground flex items-start gap-2.5">
-          <Info className="size-4 shrink-0 text-primary mt-0.5" />
-          <p>
-            Self-hosted with Supabase Auth. Set your keys in{" "}
-            <code className="font-mono text-[11px] bg-background px-1 py-0.5 rounded border border-border">
-              .env.local
-            </code>{" "}
-            to complete account creation.
-          </p>
-        </div>
-
         {/* Global Error Banner */}
         {state?.error && (
           <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive flex items-start gap-2">
