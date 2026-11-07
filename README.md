@@ -102,8 +102,4 @@ npm run build
 npm run lint
 ```
 
----
 
-## 7. Platform Architecture & Product Walkthrough
-
-For an in-depth operational guide, evaluation scenarios, and technical architectural details, refer to [PRODUCT_WALKTHROUGH.md](PRODUCT_WALKTHROUGH.md).
