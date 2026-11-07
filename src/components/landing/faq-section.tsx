@@ -3,6 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { ChevronDown } from "lucide-react"
+import { InteractiveTiltCard } from "@/components/ui/interactive-tilt-card"
 
 interface FaqItem {
   question: string
@@ -49,9 +50,10 @@ export function FaqSection() {
       {FAQS.map((faq, idx) => {
         const isOpen = openIndex === idx
         return (
-          <div
+          <InteractiveTiltCard
             key={idx}
-            className="rounded-xl border border-border bg-card shadow-xs transition-colors"
+            maxTilt={2}
+            className="p-0 rounded-xl border border-border bg-card shadow-xs transition-colors overflow-hidden"
           >
             <button
               type="button"
@@ -72,7 +74,7 @@ export function FaqSection() {
                 {faq.answer}
               </div>
             )}
-          </div>
+          </InteractiveTiltCard>
         )
       })}
     </div>

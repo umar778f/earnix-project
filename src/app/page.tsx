@@ -36,7 +36,7 @@ export default function HomePage() {
               <Sparkles className="size-4" />
             </div>
             <span className="text-base font-bold">
-              Earnix<span className="text-emerald-500">.</span>
+              Earnix
             </span>
           </Link>
 
@@ -248,7 +248,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Feature 1 */}
-            <div className="rounded-xl border border-border bg-card p-6 shadow-xs hover:border-emerald-500/40 transition-colors space-y-3">
+            <InteractiveTiltCard className="p-6 space-y-3 hover:border-emerald-500/40 transition-colors">
               <div className="flex size-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                 <Coins className="size-5" />
               </div>
@@ -258,10 +258,10 @@ export default function HomePage() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Log contract amounts in original USD, EUR, or GBP alongside converted PKR at exact payment-date rates without formula rounding drift.
               </p>
-            </div>
+            </InteractiveTiltCard>
 
             {/* Feature 2 */}
-            <div className="rounded-xl border border-border bg-card p-6 shadow-xs hover:border-blue-500/40 transition-colors space-y-3">
+            <InteractiveTiltCard className="p-6 space-y-3 hover:border-blue-500/40 transition-colors">
               <div className="flex size-11 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
                 <FileSpreadsheet className="size-5" />
               </div>
@@ -271,10 +271,10 @@ export default function HomePage() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Drop your Upwork CSV history. Earnix automatically extracts gross earnings, separates 10% platform fee deductions, and detects duplicates.
               </p>
-            </div>
+            </InteractiveTiltCard>
 
             {/* Feature 3 */}
-            <div className="rounded-xl border border-border bg-card p-6 shadow-xs hover:border-amber-500/40 transition-colors space-y-3">
+            <InteractiveTiltCard className="p-6 space-y-3 hover:border-amber-500/40 transition-colors">
               <div className="flex size-11 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
                 <Receipt className="size-5" />
               </div>
@@ -284,10 +284,10 @@ export default function HomePage() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Store receipts and invoice proofs in an encrypted vault. Track receipt coverage so your accountant has proof for every claimed business deduction.
               </p>
-            </div>
+            </InteractiveTiltCard>
 
             {/* Feature 4 */}
-            <div className="rounded-xl border border-border bg-card p-6 shadow-xs hover:border-purple-500/40 transition-colors space-y-3">
+            <InteractiveTiltCard className="p-6 space-y-3 hover:border-purple-500/40 transition-colors">
               <div className="flex size-11 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
                 <Calculator className="size-5" />
               </div>
@@ -297,10 +297,10 @@ export default function HomePage() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Automatically calculate the 1.00% final tax reserve on IT export proceeds with quarterly breakdowns ready for FBR IRIS e-filing.
               </p>
-            </div>
+            </InteractiveTiltCard>
 
             {/* Feature 5 */}
-            <div className="rounded-xl border border-border bg-card p-6 shadow-xs hover:border-cyan-500/40 transition-colors space-y-3">
+            <InteractiveTiltCard className="p-6 space-y-3 hover:border-cyan-500/40 transition-colors">
               <div className="flex size-11 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
                 <Users className="size-5" />
               </div>
@@ -310,10 +310,10 @@ export default function HomePage() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Monitor client lifetime revenue, identify your highest-paying accounts, and track project milestones across multiple platforms.
               </p>
-            </div>
+            </InteractiveTiltCard>
 
             {/* Feature 6 */}
-            <div className="rounded-xl border border-border bg-card p-6 shadow-xs hover:border-rose-500/40 transition-colors space-y-3">
+            <InteractiveTiltCard className="p-6 space-y-3 hover:border-emerald-500/40 transition-colors">
               <div className="flex size-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                 <ShieldCheck className="size-5" />
               </div>
@@ -323,7 +323,7 @@ export default function HomePage() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Your entries, documents, and clients are strictly partitioned via PostgreSQL Row Level Security (RLS). No other user can ever view your ledger.
               </p>
-            </div>
+            </InteractiveTiltCard>
           </div>
         </div>
       </section>
@@ -342,7 +342,7 @@ export default function HomePage() {
 
           <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
-            <div className="rounded-xl border border-border bg-card p-6 shadow-xs space-y-4 flex flex-col justify-between">
+            <InteractiveTiltCard className="p-6 space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="flex size-8 items-center justify-center rounded-full bg-emerald-600 text-white font-bold text-xs">
@@ -371,10 +371,10 @@ export default function HomePage() {
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold">$3,950.00</span>
                 </div>
               </div>
-            </div>
+            </InteractiveTiltCard>
 
             {/* Step 2 */}
-            <div className="rounded-xl border border-border bg-card p-6 shadow-xs space-y-4 flex flex-col justify-between">
+            <InteractiveTiltCard className="p-6 space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="flex size-8 items-center justify-center rounded-full bg-emerald-600 text-white font-bold text-xs">
@@ -403,10 +403,10 @@ export default function HomePage() {
                   <span className="text-foreground font-bold">-$84.20 USD</span>
                 </div>
               </div>
-            </div>
+            </InteractiveTiltCard>
 
             {/* Step 3 */}
-            <div className="rounded-xl border border-border bg-card p-6 shadow-xs space-y-4 flex flex-col justify-between">
+            <InteractiveTiltCard className="p-6 space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="flex size-8 items-center justify-center rounded-full bg-emerald-600 text-white font-bold text-xs">
@@ -435,7 +435,7 @@ export default function HomePage() {
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold">₨34,723 PKR</span>
                 </div>
               </div>
-            </div>
+            </InteractiveTiltCard>
           </div>
         </div>
       </section>
@@ -452,7 +452,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-xs space-y-8">
+          <InteractiveTiltCard maxTilt={1.8} className="rounded-2xl p-6 sm:p-8 shadow-xs space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
               {/* Step 1 */}
               <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-1 text-center md:text-left">
@@ -509,7 +509,7 @@ export default function HomePage() {
                 Estimates for record-keeping and reserve planning only. Not formal tax or legal advice. Consult your certified tax consultant for final FBR return filing.
               </p>
             </div>
-          </div>
+          </InteractiveTiltCard>
         </div>
       </section>
 

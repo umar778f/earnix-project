@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { InteractiveTiltCard } from "@/components/ui/interactive-tilt-card"
 import {
   Coins,
   FileSpreadsheet,
@@ -17,7 +18,10 @@ export function InteractiveDashboardDemo() {
   const [activeTab, setActiveTab] = React.useState<DemoTab>("ledger")
 
   return (
-    <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+    <InteractiveTiltCard
+      maxTilt={1.8}
+      className="p-0 rounded-2xl border-border bg-card shadow-sm overflow-hidden"
+    >
       {/* Tab Navigation Header */}
       <div className="flex border-b border-border bg-muted/30 overflow-x-auto scrollbar-none">
         <button
@@ -304,6 +308,6 @@ export function InteractiveDashboardDemo() {
           </div>
         )}
       </div>
-    </div>
+    </InteractiveTiltCard>
   )
 }
