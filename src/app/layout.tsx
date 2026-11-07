@@ -14,9 +14,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://earnix-project.vercel.app"),
   title: "Earnix | Freelancer Income Management & Tax Preparation",
   description:
     "Financial recordkeeping and tax-ready reporting platform designed specifically for freelancers.",
+  openGraph: {
+    title: "Earnix | Freelancer Income Management & Tax Preparation",
+    description:
+      "Financial recordkeeping and tax-ready reporting platform designed specifically for freelancers.",
+    url: "https://earnix-project.vercel.app",
+    siteName: "Earnix",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://earnix-project.vercel.app",
+  },
 };
 
 export default function RootLayout({

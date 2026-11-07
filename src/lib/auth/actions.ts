@@ -88,7 +88,7 @@ export async function signUpWithEmailAction(
   }
 
   const supabase = await createClient()
-  const origin = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  const origin = process.env.NEXT_PUBLIC_APP_URL || "https://earnix-project.vercel.app"
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
@@ -138,7 +138,7 @@ export async function sendPasswordResetAction(
   }
 
   const supabase = await createClient()
-  const origin = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  const origin = process.env.NEXT_PUBLIC_APP_URL || "https://earnix-project.vercel.app"
 
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
     redirectTo: `${origin}/reset-password`,

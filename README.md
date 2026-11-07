@@ -2,6 +2,8 @@
 
 **Income records and tax-reserve estimates for freelancers paid in foreign currency.**
 
+**Live Website:** [https://earnix-project.vercel.app](https://earnix-project.vercel.app)
+
 Track Upwork and direct-client payments in USD, EUR, or GBP. Log deductible expenses with receipts. Estimate what to set aside for tax.
 
 > **Disclaimer:** Earnix provides record organization and tax estimates for you and your accountant. It is not a tax authority and does not give legal or certified tax advice.
@@ -40,7 +42,7 @@ Next.js 16 · React 19 · TypeScript (strict) · Tailwind CSS v4 · shadcn/ui ·
 **Requires:** Node.js 20+, npm 10+, a Supabase project, and a Gemini API key (optional, for AI features).
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/umar778f/earnix-project.git
 cd Earnix
 cp .env.example .env.local   # fill in the values below
 npm install
@@ -57,7 +59,7 @@ npx supabase db push
 
 | Variable | Description |
 |---|---|
-| `NEXT_PUBLIC_APP_URL` | App base URL (e.g. `http://localhost:3000`) |
+| `NEXT_PUBLIC_APP_URL` | App base URL (`https://earnix-project.vercel.app` or `http://localhost:3000`) |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only key — never expose to the client |
