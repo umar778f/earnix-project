@@ -1,105 +1,99 @@
 # Earnix
 
-**AI-Powered Freelancer Income Management, Financial Recordkeeping and Tax Preparation Platform**
+**Income records and tax-reserve estimates for freelancers paid in foreign currency.**
+
+Track Upwork and direct-client payments in USD, EUR, or GBP. Log deductible expenses with receipts. Estimate what to set aside for tax.
+
+> **Disclaimer:** Earnix provides record organization and tax estimates for you and your accountant. It is not a tax authority and does not give legal or certified tax advice.
 
 ---
 
-## 1. Overview
+## Features
 
-Earnix is a specialized web-based financial management platform designed specifically for freelancers, consultants, and independent contractors. Freelancers receive payments across disparate platforms (Upwork, direct client contracts) in foreign currencies (USD, EUR, GBP) and need to maintain accurate, audit-ready records to simplify income tracking, expense management, and annual tax preparation.
-
-> **Disclaimer:** Earnix provides financial record organization, expense deduplication, and tax estimation assistance for the user and their qualified tax accountant. It does not act as an official tax authority and does not provide certified legal counsel.
-
----
-
-## 2. Core Architectural Pillars
-
-- **Financial Precision:** Absolute rejection of binary floating-point calculations for monetary values. Powered by PostgreSQL `NUMERIC(14, 4)` and TypeScript `decimal.js`.
-- **Ledger Immutability:** Dual-value ledger architecture preserving original amounts, original currencies, historical exchange rates, and converted amounts.
-- **Multi-Tenant Security:** PostgreSQL Row Level Security (RLS) ensures complete data isolation (`user_id = auth.uid()`).
-- **Grounded AI Assistance:** AI models never invent numbers or tax rules. Aggregations are calculated deterministically via database queries; AI provides natural language summaries and suggestions that require explicit user review.
+- **Dual-value ledger** — stores the original amount, currency, historical exchange rate, and converted value for every transaction
+- **Multi-currency** — USD, EUR, GBP, PKR, with rates from Frankfurter and SBP
+- **CSV import** — Upwork and bank statements, with duplicate detection
+- **Expenses and receipts** — private document vault for deductible costs
+- **Tax center** — FBR Section 154A estimate and one-click accountant CSV export
+- **AI assist** — categorization and a Copilot, both grounded in your data and reviewed by you before saving
+- **Dashboard and clients** — income trends, client breakdown, and lifetime value
 
 ---
 
-## 3. Technology Stack
+## Design principles
 
-- **Frontend:** Next.js 16 (App Router, React 19, Server Components)
-- **Language:** TypeScript (strict mode, zero `any`)
-- **Styling:** Tailwind CSS + shadcn/ui
-- **Icons:** Lucide React
-- **Precision Arithmetic:** `decimal.js`
-- **Data Validation:** Zod
-- **Backend / Database:** Supabase (PostgreSQL 16, Supabase Auth, Supabase Storage)
-- **AI Engine:** Gemini API (Structured Outputs)
-- **Deployment:** Vercel
+- **Exact money math** — `decimal.js` and PostgreSQL `NUMERIC(14,4)`, never floating point
+- **Immutable ledger** — past amounts and rates are preserved so reports are reproducible
+- **Tenant isolation** — Row Level Security on every table (`user_id = auth.uid()`)
+- **Grounded AI** — totals come from database queries; the model only summarizes and suggests
 
 ---
 
-## 4. Development Setup
+## Tech stack
 
-### Prerequisites
-- Node.js `v20+` (Tested on `v24.22.1`)
-- npm `v10+`
-
-### Installation
-1. Clone the repository and navigate into the project directory:
-   ```bash
-   cd Earnix
-   ```
-
-2. Copy the environment variables template:
-   ```bash
-   cp .env.example .env.local
-   ```
-
-3. Install project dependencies:
-   ```bash
-   npm install
-   ```
-
-4. Run the local development server:
-   ```bash
-   npm run dev
-   ```
-
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+Next.js 16 · React 19 · TypeScript (strict) · Tailwind CSS v4 · shadcn/ui · Supabase (PostgreSQL 16, Auth, Storage) · Gemini API · Zod · Recharts · Vercel
 
 ---
 
-## 5. Implementation Roadmap (100% Complete)
+## Getting started
 
-- [x] **Phase 1:** Project Architecture, Tailwind CSS v4, Design Tokens & Base Configuration
-- [x] **Phase 2:** Design System & Application Shell (Collapsible Sidebar, Header, Breadcrumbs, Responsive AppShell)
-- [x] **Phase 3:** Supabase Authentication & Route Protection Middleware (`/login`, `/signup`, `/forgot-password`)
-- [x] **Phase 4:** Database Schema, PostgreSQL Migrations & Multi-Tenant Row Level Security Policies
-- [x] **Phase 5:** Financial Dashboard, Metric Cards & Recharts Income Velocity Visualizations
-- [x] **Phase 6:** Client Directory & CRM-lite (`/clients`) with Lifetime Value Aggregations
-- [x] **Phase 7:** Transactions & Income Ledger (`/transactions`) with Multi-Filter Support
-- [x] **Phase 8:** Multi-Currency Engine (USD, EUR, GBP, PKR) with Frankfurter + SBP Exchange Sync
-- [x] **Phase 9:** Business Expense Tracker (`/expenses`) & Supabase Document Vault (`/documents`)
-- [x] **Phase 10:** Ingestion Wizard (`/transactions/import`) with RFC 4180 Upwork CSV Statement Parser
-- [x] **Phase 11:** AI Transaction & Expense Categorization (Gemini 2.5 Flash + Human-in-the-Loop Review Stage)
-- [x] **Phase 12:** AI Financial Assistant — Earnix Copilot (`/copilot`) with Deterministic RAG Grounding
-- [x] **Phase 13:** Tax Preparation Center (`/tax`) with FBR Section 154A IT Benchmark & 1-Click Accountant CSV Export
-- [x] **Phase 14:** Real-time Notifications & Quarterly Tax Reminders Flyout
-- [x] **Phase 15:** Multi-Tenant Security Audits, Row Level Security Verification & 35-Point Automated Test Suite
-- [x] **Phase 16:** Commercialization, Security Hardening & Production Operations Suite
-
----
-
-## 6. Testing & Quality Verification
-
-Run the automated test verification suite covering financial precision, currency conversion, tax engine edge cases, statement parsers, and security boundaries:
+**Requires:** Node.js 20+, npm 10+, a Supabase project, and a Gemini API key (optional, for AI features).
 
 ```bash
-npm test
+git clone <your-repo-url>
+cd Earnix
+cp .env.example .env.local   # fill in the values below
+npm install
+npm run dev                  # http://localhost:3000
 ```
 
-Build the production application:
+Apply the database migrations to your Supabase project:
 
 ```bash
-npm run build
+npx supabase db push
+```
+
+### Environment variables
+
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_APP_URL` | App base URL (e.g. `http://localhost:3000`) |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only key — never expose to the client |
+| `GEMINI_API_KEY` | Enables AI categorization and Copilot |
+| `EXCHANGE_RATE_API_KEY` | Optional — leave blank to use public Frankfurter/ECB endpoints |
+
+---
+
+## Testing
+
+```bash
+npm test        # 35-point suite: money precision, currency, tax engine, CSV, RLS
 npm run lint
+npm run build
 ```
 
+---
+
+## Routes
+
+| Path | Description |
+|---|---|
+| `/` | Landing page |
+| `/dashboard` | Income summary, trends, and tax reserve widget |
+| `/transactions` | Full ledger with multi-currency filter |
+| `/transactions/import` | Upwork / bank CSV ingestion wizard |
+| `/expenses` | Deductible expense tracker |
+| `/documents` | Encrypted receipt and invoice vault |
+| `/clients` | Client directory with lifetime value |
+| `/tax` | FBR Section 154A estimate and CSV export |
+| `/copilot` | AI financial assistant grounded in your ledger |
+| `/settings` | Account and currency preferences |
+
+---
+
+## License
+
+MIT
 
