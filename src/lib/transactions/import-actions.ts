@@ -368,14 +368,42 @@ export async function commitImportBatchAction(
         }
       }
 
+      const totalGross = incomeRows.reduce((acc, r) => acc + r.convertedAmount, 0)
+      const formattedTotal = totalGross.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+
+      // 4. Automatically create in-app notification in notifications table
+      try {
+        const notifTitle =
+          platformCode === "upwork"
+            ? `Upwork Ingestion: ${transactionsToInsert.length} milestone${transactionsToInsert.length === 1 ? "" : "s"} added`
+            : `Statement Ingestion: ${transactionsToInsert.length} record${transactionsToInsert.length === 1 ? "" : "s"} added`
+
+        const notifMessage =
+          platformCode === "upwork"
+            ? `Successfully committed ${transactionsToInsert.length} Upwork milestone${transactionsToInsert.length === 1 ? "" : "s"} (${baseCurrency} ${formattedTotal})${importedFeesCount > 0 ? ` and ${importedFeesCount} platform fee expense${importedFeesCount === 1 ? "" : "s"}` : ""} to your ledger.`
+            : `Successfully committed ${transactionsToInsert.length} transaction${transactionsToInsert.length === 1 ? "" : "s"} (${baseCurrency} ${formattedTotal}) to your ledger.`
+
+        await supabase.from("notifications").insert({
+          user_id: user.id,
+          title: notifTitle,
+          message: notifMessage,
+          type: "info",
+          is_read: false,
+          action_url: "/transactions",
+        })
+      } catch (notifErr) {
+        console.warn("Could not insert notification for imported batch:", notifErr)
+      }
+
       // Revalidate cache paths
       revalidatePath("/transactions")
       revalidatePath("/dashboard")
       revalidatePath("/clients")
       revalidatePath("/expenses")
       revalidatePath("/tax")
-
-      const totalGross = incomeRows.reduce((acc, r) => acc + r.convertedAmount, 0)
 
       return {
         success: true,
