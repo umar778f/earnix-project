@@ -2,8 +2,6 @@
 
 **Income records and tax-reserve estimates for freelancers paid in foreign currency.**
 
-**Live Website:** [https://earnix-project.vercel.app](https://earnix-project.vercel.app)
-
 Track Upwork and direct-client payments in USD, EUR, or GBP. Log deductible expenses with receipts. Estimate what to set aside for tax.
 
 > **Disclaimer:** Earnix provides record organization and tax estimates for you and your accountant. It is not a tax authority and does not give legal or certified tax advice.
