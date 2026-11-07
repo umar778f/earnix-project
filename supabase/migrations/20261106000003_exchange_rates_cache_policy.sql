@@ -5,11 +5,13 @@
 -- Purpose: Allows authenticated sessions to cache verified foreign exchange rate
 --          snapshots from public sources (Frankfurter/ECB/SBP).
 
+DROP POLICY IF EXISTS "Authenticated users can insert exchange rate snapshots" ON public.exchange_rates;
 CREATE POLICY "Authenticated users can insert exchange rate snapshots"
     ON public.exchange_rates FOR INSERT
     TO authenticated
     WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Authenticated users can update exchange rate snapshots" ON public.exchange_rates;
 CREATE POLICY "Authenticated users can update exchange rate snapshots"
     ON public.exchange_rates FOR UPDATE
     TO authenticated

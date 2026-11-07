@@ -111,42 +111,44 @@ export async function confirmAiTransactionCategoryAction(
   transactionId: string,
   approvedCategory?: string
 ): Promise<AiActionResult> {
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        return { success: false, error: "Authentication required." }
-      }
-
-      const { error } = await supabase
-        .from("transactions")
-        .update({
-          ai_review_status: "confirmed" as const,
-          updated_at: new Date().toISOString(),
-          ...(approvedCategory ? { category: approvedCategory } : {}),
-        })
-        .eq("id", transactionId)
-        .eq("user_id", user.id)
-
-      if (error) {
-        return { success: false, error: error.message }
-      }
-
-      revalidatePath("/transactions")
-      revalidatePath("/dashboard")
-      return { success: true }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Confirmation failed"
-      return { success: false, error: msg }
+  if (!isSupabaseConfigured()) {
+    return {
+      success: false,
+      error: "Supabase credentials are not configured. Cannot update record status.",
     }
   }
 
-  revalidatePath("/transactions")
-  return { success: true }
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return { success: false, error: "Authentication required." }
+    }
+
+    const { error } = await supabase
+      .from("transactions")
+      .update({
+        ai_review_status: "confirmed" as const,
+        updated_at: new Date().toISOString(),
+        ...(approvedCategory ? { category: approvedCategory } : {}),
+      })
+      .eq("id", transactionId)
+      .eq("user_id", user.id)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/transactions")
+    revalidatePath("/dashboard")
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Confirmation failed"
+    return { success: false, error: msg }
+  }
 }
 
 /**
@@ -159,41 +161,43 @@ export async function bulkConfirmAiTransactionsAction(
     return { success: true, data: { confirmedCount: 0 } }
   }
 
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        return { success: false, error: "Authentication required." }
-      }
-
-      const { error } = await supabase
-        .from("transactions")
-        .update({
-          ai_review_status: "confirmed",
-          updated_at: new Date().toISOString(),
-        })
-        .in("id", approvedIds)
-        .eq("user_id", user.id)
-
-      if (error) {
-        return { success: false, error: error.message }
-      }
-
-      revalidatePath("/transactions")
-      revalidatePath("/dashboard")
-      return { success: true, data: { confirmedCount: approvedIds.length } }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Bulk confirmation failed"
-      return { success: false, error: msg }
+  if (!isSupabaseConfigured()) {
+    return {
+      success: false,
+      error: "Supabase credentials are not configured. Cannot update record status.",
     }
   }
 
-  revalidatePath("/transactions")
-  return { success: true, data: { confirmedCount: approvedIds.length } }
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return { success: false, error: "Authentication required." }
+    }
+
+    const { error } = await supabase
+      .from("transactions")
+      .update({
+        ai_review_status: "confirmed",
+        updated_at: new Date().toISOString(),
+      })
+      .in("id", approvedIds)
+      .eq("user_id", user.id)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/transactions")
+    revalidatePath("/dashboard")
+    return { success: true, data: { confirmedCount: approvedIds.length } }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Bulk confirmation failed"
+    return { success: false, error: msg }
+  }
 }
 
 /**
@@ -279,39 +283,41 @@ export async function bulkConfirmAiExpensesAction(
     return { success: true, data: { confirmedCount: 0 } }
   }
 
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        return { success: false, error: "Authentication required." }
-      }
-
-      const { error } = await supabase
-        .from("expenses")
-        .update({
-          ai_review_status: "confirmed",
-          updated_at: new Date().toISOString(),
-        })
-        .in("id", approvedIds)
-        .eq("user_id", user.id)
-
-      if (error) {
-        return { success: false, error: error.message }
-      }
-
-      revalidatePath("/expenses")
-      revalidatePath("/tax")
-      return { success: true, data: { confirmedCount: approvedIds.length } }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Bulk confirmation failed"
-      return { success: false, error: msg }
+  if (!isSupabaseConfigured()) {
+    return {
+      success: false,
+      error: "Supabase credentials are not configured. Cannot update record status.",
     }
   }
 
-  revalidatePath("/expenses")
-  return { success: true, data: { confirmedCount: approvedIds.length } }
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return { success: false, error: "Authentication required." }
+    }
+
+    const { error } = await supabase
+      .from("expenses")
+      .update({
+        ai_review_status: "confirmed",
+        updated_at: new Date().toISOString(),
+      })
+      .in("id", approvedIds)
+      .eq("user_id", user.id)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/expenses")
+    revalidatePath("/tax")
+    return { success: true, data: { confirmedCount: approvedIds.length } }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Bulk confirmation failed"
+    return { success: false, error: msg }
+  }
 }

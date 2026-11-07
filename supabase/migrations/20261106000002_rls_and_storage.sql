@@ -21,17 +21,20 @@ CREATE POLICY "Users can view own profile"
     ON public.profiles FOR SELECT
     USING (auth.uid() = id);
 
+CREATE POLICY "Users can insert own profile"
+    ON public.profiles FOR INSERT
+    WITH CHECK (auth.uid() = id);
+
 CREATE POLICY "Users can update own profile"
     ON public.profiles FOR UPDATE
     USING (auth.uid() = id)
     WITH CHECK (auth.uid() = id);
 
 -- ------------------------------------------------------------------------------
--- 3. PLATFORMS POLICIES (Catalog is read-only for authenticated users)
+-- 3. PLATFORMS POLICIES (Catalog is read-only for all sessions)
 -- ------------------------------------------------------------------------------
-CREATE POLICY "Authenticated users can view active platforms"
+CREATE POLICY "Users can view active platforms"
     ON public.platforms FOR SELECT
-    TO authenticated
     USING (is_active = true);
 
 -- ------------------------------------------------------------------------------
@@ -135,12 +138,23 @@ CREATE POLICY "Users can delete own tax profile"
     USING (auth.uid() = user_id);
 
 -- ------------------------------------------------------------------------------
--- 9. EXCHANGE RATES POLICIES (Global read-only cache for authenticated users)
+-- 9. EXCHANGE RATES POLICIES (Global cache for authenticated sessions)
 -- ------------------------------------------------------------------------------
 CREATE POLICY "Authenticated users can view exchange rates"
     ON public.exchange_rates FOR SELECT
     TO authenticated
     USING (true);
+
+CREATE POLICY "Authenticated users can insert exchange rate snapshots"
+    ON public.exchange_rates FOR INSERT
+    TO authenticated
+    WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can update exchange rate snapshots"
+    ON public.exchange_rates FOR UPDATE
+    TO authenticated
+    USING (true)
+    WITH CHECK (true);
 
 -- ------------------------------------------------------------------------------
 -- 10. NOTIFICATIONS POLICIES
@@ -188,6 +202,18 @@ CREATE POLICY "Freelancers can access own document files"
 CREATE POLICY "Freelancers can upload own document files"
     ON storage.objects FOR INSERT
     TO authenticated
+    WITH CHECK (
+        bucket_id = 'documents' AND
+        (storage.foldername(name))[1] = auth.uid()::text
+    );
+
+CREATE POLICY "Freelancers can update own document files"
+    ON storage.objects FOR UPDATE
+    TO authenticated
+    USING (
+        bucket_id = 'documents' AND
+        (storage.foldername(name))[1] = auth.uid()::text
+    )
     WITH CHECK (
         bucket_id = 'documents' AND
         (storage.foldername(name))[1] = auth.uid()::text

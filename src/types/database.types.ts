@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type SourceType = "csv_upwork" | "csv_generic" | "manual" | "demo"
+export type SourceType = "csv_upwork" | "csv_generic" | "manual" | "direct"
 export type TransactionStatus = "completed" | "pending" | "refunded"
 export type AiReviewStatus = "unassigned" | "pending_review" | "confirmed" | "rejected"
 export type DocumentType = "invoice" | "receipt" | "bank_statement" | "tax_certificate"

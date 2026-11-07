@@ -232,13 +232,13 @@ function parseUpworkDate(dateStr: string): string {
  * Pre-configured realistic Upwork CSV Statement template for testing ingestion
  */
 export const SAMPLE_UPWORK_CSV = `Date,Ref ID,Type,Description,Agency,Freelancer,Team,Account Name,Amount,Currency
-Nov 2 2026,98240182,Fixed Price,Invoice for Milestone 3: Next.js SaaS Architecture & API Implementation,,Umar,,Acme Cloud Solutions,1800.00,USD
-Nov 2 2026,98240183,Service Fee,Upwork Service Fee for Milestone 3 - Acme Cloud Solutions,,Umar,,Upwork,-180.00,USD
-Oct 28 2026,98240170,Hourly,Hourly salary for 24.5 hrs at $45.00/hr - Frontend Optimization,,Umar,,PixelCraft Studios,1102.50,USD
-Oct 28 2026,98240171,Service Fee,Upwork Service Fee for Hourly Contract - PixelCraft Studios,,Umar,,Upwork,-110.25,USD
-Oct 21 2026,98240155,Fixed Price,Milestone 1: PostgreSQL Schema Design & Query Tuning,,Umar,,BrightWave Media,950.00,USD
-Oct 21 2026,98240156,Service Fee,Upwork Service Fee for Milestone 1 - BrightWave Media,,Umar,,Upwork,-95.00,USD
-Oct 14 2026,98240140,Hourly,Hourly salary for 18.0 hrs at $50.00/hr - AI Copilot Integration,,Umar,,Nordic FinTech Labs,900.00,USD
-Oct 14 2026,98240141,Service Fee,Upwork Service Fee for Hourly - Nordic FinTech Labs,,Umar,,Upwork,-90.00,USD
-Oct 05 2026,98240110,Withdrawal,Direct to Local Bank (Wire Transfer PKR) - Ref: W-9482110,,Umar,,Bank Transfer,-4277.25,USD`
+Nov 2 2026,98240182,Fixed Price,Invoice for Milestone 3: Next.js SaaS Architecture & API Implementation,,Freelancer,,Acme Cloud Solutions,1800.00,USD
+Nov 2 2026,98240183,Service Fee,Upwork Service Fee for Milestone 3 - Acme Cloud Solutions,,Freelancer,,Upwork,-180.00,USD
+Oct 28 2026,98240170,Hourly,Hourly salary for 24.5 hrs at $45.00/hr - Frontend Optimization,,Freelancer,,PixelCraft Studios,1102.50,USD
+Oct 28 2026,98240171,Service Fee,Upwork Service Fee for Hourly Contract - PixelCraft Studios,,Freelancer,,Upwork,-110.25,USD
+Oct 21 2026,98240155,Fixed Price,Milestone 1: PostgreSQL Schema Design & Query Tuning,,Freelancer,,BrightWave Media,950.00,USD
+Oct 21 2026,98240156,Service Fee,Upwork Service Fee for Milestone 1 - BrightWave Media,,Freelancer,,Upwork,-95.00,USD
+Oct 14 2026,98240140,Hourly,Hourly salary for 18.0 hrs at $50.00/hr - AI Copilot Integration,,Freelancer,,Nordic FinTech Labs,900.00,USD
+Oct 14 2026,98240141,Service Fee,Upwork Service Fee for Hourly - Nordic FinTech Labs,,Freelancer,,Upwork,-90.00,USD
+Oct 05 2026,98240110,Withdrawal,Direct to Local Bank (Wire Transfer PKR) - Ref: W-9482110,,Freelancer,,Bank Transfer,-4277.25,USD`
 

@@ -138,8 +138,8 @@ export function TransactionTableView({
         return { label: "Invoice CSV", bg: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20" }
       case "manual":
         return { label: "Manual Entry", bg: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20" }
-      case "demo":
-        return { label: "Sample Import", bg: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" }
+      case "direct":
+        return { label: "Direct Client", bg: "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20" }
       default:
         return { label: "Ledger", bg: "bg-muted text-muted-foreground border-border" }
     }

@@ -11,7 +11,7 @@ export interface DashboardTransactionItem {
   convertedCurrency: string
   paymentDate: string
   status: "completed" | "pending" | "refunded"
-  sourceType: "csv_upwork" | "csv_generic" | "manual" | "demo"
+  sourceType: "csv_upwork" | "csv_generic" | "manual" | "direct"
   category: string
 }
 
