@@ -24,21 +24,48 @@ export async function askCopilotAction(query: string): Promise<CopilotActionResu
     }
   }
 
+  let isAuthenticated = false
   if (isSupabaseConfigured()) {
     try {
       const supabase = await createClient()
       const {
         data: { user },
       } = await supabase.auth.getUser()
-
-      if (!user) {
-        return {
-          success: false,
-          error: "Authentication required to query financial records.",
-        }
-      }
+      isAuthenticated = Boolean(user)
     } catch {
-      // Allow fallback if session read fails in demo/offline mode
+      isAuthenticated = false
+    }
+  } else {
+    isAuthenticated = true
+  }
+
+  const queryLower = trimmed.toLowerCase()
+  const isGeneralOrTaxQuery =
+    queryLower.includes("how you calculate tax") ||
+    queryLower.includes("how do you calculate tax") ||
+    queryLower.includes("how is tax calculated") ||
+    queryLower.includes("calculate tax") ||
+    queryLower.includes("tax formula") ||
+    queryLower.includes("how tax works") ||
+    queryLower.includes("what is earnix") ||
+    queryLower.includes("supported currencies") ||
+    queryLower.includes("how does it work")
+
+  if (!isAuthenticated && !isGeneralOrTaxQuery) {
+    return {
+      success: true,
+      data: {
+        query: trimmed,
+        answer:
+          "Please sign in or create an account to view your private financial ledger and Upwork earnings. Earnix protects all financial records using PostgreSQL Row Level Security (RLS) so that your earnings, expenses, and tax records are strictly accessible only to your authenticated account.",
+        groundedMetrics: [
+          { label: "Account Status", value: "Sign-In Required" },
+          { label: "Ledger Security", value: "PostgreSQL RLS Active" },
+        ],
+        citations: [],
+        deterministicModel: "Earnix Grounded Security Engine",
+        timestamp: new Date().toISOString(),
+      },
     }
   }
 

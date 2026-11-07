@@ -94,6 +94,30 @@ export async function queryEarnixCopilot(userQuery: string): Promise<CopilotAnsw
     }
   }
 
+  // Check if query is tax focused
+  let isTaxSpecific = false
+  let isTaxMethodology = false
+
+  if (
+    queryLower.includes("tax") ||
+    queryLower.includes("deduction") ||
+    queryLower.includes("fbr") ||
+    queryLower.includes("irs") ||
+    queryLower.includes("reserve")
+  ) {
+    isTaxSpecific = true
+    if (
+      queryLower.includes("how") ||
+      queryLower.includes("calculate") ||
+      queryLower.includes("formula") ||
+      queryLower.includes("rule") ||
+      queryLower.includes("work") ||
+      queryLower.includes("method")
+    ) {
+      isTaxMethodology = true
+    }
+  }
+
   // Calculate exact figures via Decimal
   let totalIncomeDec = new Decimal(0)
   for (const t of filteredTransactions) {
@@ -150,7 +174,24 @@ export async function queryEarnixCopilot(userQuery: string): Promise<CopilotAnsw
   // Compile Grounded Metrics
   const groundedMetrics: CopilotGroundedMetric[] = []
 
-  if (isUpworkSpecific) {
+  if (isTaxSpecific) {
+    groundedMetrics.push({
+      label: "Gross Income",
+      value: formatMoney(totalIncomeDec.toNumber(), baseCurrency),
+    })
+    groundedMetrics.push({
+      label: "Allowable Deductions",
+      value: formatMoney(deductibleExpenseDec.toNumber(), baseCurrency),
+    })
+    groundedMetrics.push({
+      label: "Net Taxable Income",
+      value: formatMoney(netIncomeDec.toNumber(), baseCurrency),
+    })
+    groundedMetrics.push({
+      label: "1% Tax Estimate Reserve",
+      value: formatMoney(estimatedTaxReserveDec.toNumber(), baseCurrency),
+    })
+  } else if (isUpworkSpecific) {
     groundedMetrics.push({
       label: "Upwork Gross Earnings",
       value: formatMoney(totalIncomeDec.toNumber(), baseCurrency),
@@ -261,7 +302,52 @@ ${verifiedContext}`
   // Deterministic Fallback Response (Guaranteed Offline Resilience)
   let fallbackAnswer = ""
 
-  if (isUpworkSpecific) {
+  if (isTaxSpecific) {
+    if (isTaxMethodology) {
+      fallbackAnswer = `Earnix calculates your estimated freelance tax liability through a transparent 5-step deterministic accounting workflow:
+
+1. Gross Inflow: All verified freelance payments across Upwork, direct clients, and bank remittances are converted into your base currency (${baseCurrency}) at the verified exchange rate on the payment date. Your current verified gross income is ${formatMoney(
+        totalIncomeDec.toNumber(),
+        baseCurrency
+      )}.
+
+2. Allowable Deductible Expenses: Operating business expenses (cloud hosting, software licenses, domain fees, hardware, platform fees) flagged as tax-deductible reduce your taxable footprint. Your current allowable deductions total ${formatMoney(
+        deductibleExpenseDec.toNumber(),
+        baseCurrency
+      )}.
+
+3. Net Taxable Income: Calculated deterministically with arbitrary-precision Decimal.js arithmetic as Gross Income minus Allowable Deductions, currently yielding ${formatMoney(
+        netIncomeDec.toNumber(),
+        baseCurrency
+      )}.
+
+4. Jurisdiction Benchmark Rates: Applies your configured tax regime:
+- Pakistan (FBR Section 154A): Flat 1.00% final tax benchmark on gross export remittances for registered IT and freelance services.
+- United States (IRS Baseline): 15.3% self-employment and quarterly estimated tax baseline.
+- United Kingdom (HMRC): 9.0% Class 4 NIC sole trader baseline.
+- Global / Custom: Configurable percentage matching your local tax jurisdiction.
+Your recommended 1.00% tax reserve is currently ${formatMoney(
+        estimatedTaxReserveDec.toNumber(),
+        baseCurrency
+      )}.
+
+5. Advance Withholding Credits: Pre-deducted taxes withheld by payment processors or banks (WHT) are subtracted directly from your gross tax estimate to calculate your exact Net Tax Payable or Refund.`
+    } else {
+      fallbackAnswer = `Based on your verified ledger records in ${baseCurrency}, your gross freelance income stands at ${formatMoney(
+        totalIncomeDec.toNumber(),
+        baseCurrency
+      )} with allowable business deductions of ${formatMoney(
+        deductibleExpenseDec.toNumber(),
+        baseCurrency
+      )}. This yields a net taxable income of ${formatMoney(
+        netIncomeDec.toNumber(),
+        baseCurrency
+      )}, and a recommended 1.00% estimated tax reserve of ${formatMoney(
+        estimatedTaxReserveDec.toNumber(),
+        baseCurrency
+      )}.`
+    }
+  } else if (isUpworkSpecific) {
     fallbackAnswer = `Based on your verified ledger records, your total gross earnings received from Upwork stand at ${formatMoney(
       totalIncomeDec.toNumber(),
       baseCurrency
