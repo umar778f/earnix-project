@@ -32,7 +32,7 @@ const SUGGESTED_PROMPTS = [
   "What was my total gross income from Upwork?",
   "What are my total business expenses and deductible costs?",
   "What is my estimated taxable net income and recommended tax reserve?",
-  "How much revenue did I generate from Acme Cloud Solutions?",
+  "Which client generated the highest revenue this year?",
 ]
 
 export function CopilotChat() {

@@ -84,7 +84,7 @@ export function ClientDialog({
               id="name"
               name="name"
               defaultValue={clientToEdit?.name || ""}
-              placeholder="e.g. Acme Cloud Corp"
+              placeholder="e.g. Global Tech Solutions"
               required
               disabled={isPending}
             />
