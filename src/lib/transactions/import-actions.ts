@@ -399,16 +399,13 @@ export async function commitImportBatchAction(
     }
   }
 
-  // Guest / preview fallback
-  revalidatePath("/transactions")
-  revalidatePath("/dashboard")
-  const totalGross = incomeRows.reduce((acc, r) => acc + r.convertedAmount, 0)
   return {
-    success: true,
-    importedTransactionsCount: incomeRows.length,
-    importedFeesCount: importFeesAsExpenses ? feeRows.length : 0,
-    createdClientsCount: new Set(incomeRows.map((r) => r.clientName).filter(Boolean)).size,
-    totalGrossImported: Number(totalGross.toFixed(2)),
+    success: false,
+    error: "Supabase credentials are not configured. Cannot commit transactions to the database ledger.",
+    importedTransactionsCount: 0,
+    importedFeesCount: 0,
+    createdClientsCount: 0,
+    totalGrossImported: 0,
     baseCurrency: "USD",
   }
 }

@@ -51,249 +51,19 @@ export interface TransactionsPageData {
   isDemoData: boolean
 }
 
-export const DEMO_TRANSACTIONS_LIST: TransactionRecordItem[] = [
-  {
-    id: "demo-tx-01",
-    referenceId: "UP-2026-10492",
-    clientId: "demo-client-01",
-    clientName: "Acme Cloud Solutions",
-    platformId: "00000000-0000-0000-0000-000000000001",
-    platformCode: "upwork",
-    platformName: "Upwork",
-    originalAmount: 1800.0,
-    originalCurrency: "USD",
-    exchangeRate: 1.0,
-    convertedAmount: 1800.0,
-    convertedCurrency: "USD",
-    conversionDate: "2026-11-02",
-    conversionSource: "ecb_frankfurter",
-    paymentDate: "2026-11-02T14:30:00Z",
-    description: "Milestone 3: Next.js SaaS Architecture & API Implementation",
-    status: "completed",
-    sourceType: "demo",
-    category: "Software Development",
-    aiReviewStatus: "pending_review",
-    aiConfidence: 0.94,
-    metadata: { contractType: "Fixed Price", feeAmount: 180.0 },
-    createdAt: "2026-11-02T14:30:00Z",
-    isDemo: true,
-  },
-  {
-    id: "demo-tx-02",
-    referenceId: "INV-2026-088",
-    clientId: "demo-client-02",
-    clientName: "Nordic FinTech Labs",
-    platformId: "00000000-0000-0000-0000-000000000002",
-    platformCode: "generic_csv",
-    platformName: "Direct Invoice",
-    originalAmount: 2200.0,
-    originalCurrency: "EUR",
-    exchangeRate: 1.085,
-    convertedAmount: 2387.0,
-    convertedCurrency: "USD",
-    conversionDate: "2026-10-28",
-    conversionSource: "ecb_frankfurter",
-    paymentDate: "2026-10-28T09:15:00Z",
-    description: "Monthly Retainer: Full-Stack Engineering & Code Review",
-    status: "completed",
-    sourceType: "demo",
-    category: "Software Development",
-    metadata: { invoiceNumber: "NF-2026-10", paymentMethod: "SEPA Wire" },
-    createdAt: "2026-10-28T09:15:00Z",
-    isDemo: true,
-  },
-  {
-    id: "demo-tx-03",
-    referenceId: "UP-2026-10440",
-    clientId: "demo-client-03",
-    clientName: "PixelCraft Studios",
-    platformId: "00000000-0000-0000-0000-000000000001",
-    platformCode: "upwork",
-    platformName: "Upwork",
-    originalAmount: 1102.5,
-    originalCurrency: "USD",
-    exchangeRate: 1.0,
-    convertedAmount: 1102.5,
-    convertedCurrency: "USD",
-    conversionDate: "2026-10-21",
-    conversionSource: "ecb_frankfurter",
-    paymentDate: "2026-10-21T16:45:00Z",
-    description: "Hourly Contract: 24.5 hrs at $45/hr — Frontend Optimization",
-    status: "completed",
-    sourceType: "demo",
-    category: "Freelance Income",
-    metadata: { hourlyRate: 45.0, hoursLogged: 24.5 },
-    createdAt: "2026-10-21T16:45:00Z",
-    isDemo: true,
-  },
-  {
-    id: "demo-tx-04",
-    referenceId: "DIR-2026-031",
-    clientId: "demo-client-04",
-    clientName: "Apex Retail Analytics",
-    platformId: "00000000-0000-0000-0000-000000000003",
-    platformCode: "manual",
-    platformName: "Manual Entry",
-    originalAmount: 950.0,
-    originalCurrency: "USD",
-    exchangeRate: 1.0,
-    convertedAmount: 950.0,
-    convertedCurrency: "USD",
-    conversionDate: "2026-10-14",
-    conversionSource: "manual_entry",
-    paymentDate: "2026-10-14T11:00:00Z",
-    description: "Direct Client: PostgreSQL Database Performance Tuning",
-    status: "completed",
-    sourceType: "demo",
-    category: "Consulting",
-    metadata: { serviceScope: "Database Optimization" },
-    createdAt: "2026-10-14T11:00:00Z",
-    isDemo: true,
-  },
-  {
-    id: "demo-tx-05",
-    referenceId: "UP-2026-10398",
-    clientId: "demo-client-01",
-    clientName: "Acme Cloud Solutions",
-    platformId: "00000000-0000-0000-0000-000000000001",
-    platformCode: "upwork",
-    platformName: "Upwork",
-    originalAmount: 2400.0,
-    originalCurrency: "USD",
-    exchangeRate: 1.0,
-    convertedAmount: 2400.0,
-    convertedCurrency: "USD",
-    conversionDate: "2026-10-08",
-    conversionSource: "ecb_frankfurter",
-    paymentDate: "2026-10-08T15:00:00Z",
-    description: "Milestone 2: Multi-Tenant Database Architecture & Supabase RLS",
-    status: "completed",
-    sourceType: "demo",
-    category: "Freelance Income",
-    metadata: { contractType: "Fixed Price" },
-    createdAt: "2026-10-08T15:00:00Z",
-    isDemo: true,
-  },
-  {
-    id: "demo-tx-06",
-    referenceId: "INV-2026-092",
-    clientId: "demo-client-02",
-    clientName: "Nordic FinTech Labs",
-    platformId: "00000000-0000-0000-0000-000000000002",
-    platformCode: "generic_csv",
-    platformName: "Direct Invoice",
-    originalAmount: 1800.0,
-    originalCurrency: "EUR",
-    exchangeRate: 1.085,
-    convertedAmount: 1953.0,
-    convertedCurrency: "USD",
-    conversionDate: "2026-09-29",
-    conversionSource: "ecb_frankfurter",
-    paymentDate: "2026-09-29T10:00:00Z",
-    description: "Consulting: Real-time FX Integration & Decimal Engine",
-    status: "completed",
-    sourceType: "demo",
-    category: "Software Development",
-    metadata: { invoiceNumber: "NF-2026-09" },
-    createdAt: "2026-09-29T10:00:00Z",
-    isDemo: true,
-  },
-  {
-    id: "demo-tx-07",
-    referenceId: "UP-2026-10312",
-    clientId: "demo-client-03",
-    clientName: "PixelCraft Studios",
-    platformId: "00000000-0000-0000-0000-000000000001",
-    platformCode: "upwork",
-    platformName: "Upwork",
-    originalAmount: 1350.0,
-    originalCurrency: "USD",
-    exchangeRate: 1.0,
-    convertedAmount: 1350.0,
-    convertedCurrency: "USD",
-    conversionDate: "2026-09-15",
-    conversionSource: "ecb_frankfurter",
-    paymentDate: "2026-09-15T18:00:00Z",
-    description: "Milestone: Tailwind CSS v4 & Theme Token System",
-    status: "completed",
-    sourceType: "demo",
-    category: "Freelance Income",
-    metadata: { contractType: "Fixed Price" },
-    createdAt: "2026-09-15T18:00:00Z",
-    isDemo: true,
-  },
-  {
-    id: "demo-tx-08",
-    referenceId: "DIR-2026-039",
-    clientId: "demo-client-04",
-    clientName: "Apex Retail Analytics",
-    platformId: "00000000-0000-0000-0000-000000000003",
-    platformCode: "manual",
-    platformName: "Manual Entry",
-    originalAmount: 1200.0,
-    originalCurrency: "USD",
-    exchangeRate: 1.0,
-    convertedAmount: 1200.0,
-    convertedCurrency: "USD",
-    conversionDate: "2026-11-04",
-    conversionSource: "manual_entry",
-    paymentDate: "2026-11-04T12:00:00Z",
-    description: "Pending Invoice: E-Commerce Data Pipeline Setup",
-    status: "pending",
-    sourceType: "demo",
-    category: "Consulting",
-    metadata: { terms: "Net 15" },
-    createdAt: "2026-11-04T12:00:00Z",
-    isDemo: true,
-  },
-]
-
-export const DEMO_CLIENTS_OPTIONS = [
-  { id: "demo-client-01", name: "Acme Cloud Solutions" },
-  { id: "demo-client-02", name: "Nordic FinTech Labs" },
-  { id: "demo-client-03", name: "PixelCraft Studios" },
-  { id: "demo-client-04", name: "Apex Retail Analytics" },
-]
-
-export const DEMO_PLATFORMS_OPTIONS = [
+export const DEFAULT_PLATFORMS = [
   { id: "00000000-0000-0000-0000-000000000001", code: "upwork", name: "Upwork" },
   { id: "00000000-0000-0000-0000-000000000002", code: "generic_csv", name: "Generic CSV Import" },
   { id: "00000000-0000-0000-0000-000000000003", code: "manual", name: "Manual Entry" },
   { id: "00000000-0000-0000-0000-000000000004", code: "direct", name: "Direct Client" },
 ]
 
-export async function getTransactionsData(options?: { preferDemo?: boolean }): Promise<TransactionsPageData> {
-  if (options?.preferDemo) {
-    let grossDec = toDecimal(0)
-    let completed = 0
-    let pending = 0
-
-    for (const tx of DEMO_TRANSACTIONS_LIST) {
-      if (tx.status === "completed") {
-        grossDec = addDecimals(grossDec, toDecimal(tx.convertedAmount))
-        completed++
-      } else if (tx.status === "pending") {
-        pending++
-      }
-    }
-
-    return {
-      transactions: DEMO_TRANSACTIONS_LIST,
-      clients: DEMO_CLIENTS_OPTIONS,
-      platforms: DEMO_PLATFORMS_OPTIONS,
-      baseCurrency: "USD",
-      totalConvertedGross: grossDec.toNumber(),
-      completedCount: completed,
-      pendingCount: pending,
-      isDemoData: false,
-    }
-  }
-
+export async function getTransactionsData(): Promise<TransactionsPageData> {
   if (!isSupabaseConfigured()) {
     return {
       transactions: [],
       clients: [],
-      platforms: DEMO_PLATFORMS_OPTIONS,
+      platforms: DEFAULT_PLATFORMS,
       baseCurrency: "USD",
       totalConvertedGross: 0,
       completedCount: 0,
@@ -312,7 +82,7 @@ export async function getTransactionsData(options?: { preferDemo?: boolean }): P
       return {
         transactions: [],
         clients: [],
-        platforms: DEMO_PLATFORMS_OPTIONS,
+        platforms: DEFAULT_PLATFORMS,
         baseCurrency: "USD",
         totalConvertedGross: 0,
         completedCount: 0,
@@ -336,7 +106,7 @@ export async function getTransactionsData(options?: { preferDemo?: boolean }): P
       .select("id, code, name")
       .eq("is_active", true)
 
-    const platforms = platformsData && platformsData.length > 0 ? platformsData : DEMO_PLATFORMS_OPTIONS
+    const platforms = platformsData && platformsData.length > 0 ? platformsData : DEFAULT_PLATFORMS
 
     // Query clients
     const { data: clientsData } = await supabase
@@ -345,7 +115,7 @@ export async function getTransactionsData(options?: { preferDemo?: boolean }): P
       .eq("user_id", user.id)
       .order("name", { ascending: true })
 
-    const clients = clientsData && clientsData.length > 0 ? clientsData : DEMO_CLIENTS_OPTIONS
+    const clients = clientsData || []
 
     // Query transactions
     const { data: transactionsData } = await supabase
@@ -448,7 +218,7 @@ export async function getTransactionsData(options?: { preferDemo?: boolean }): P
     return {
       transactions: [],
       clients: [],
-      platforms: DEMO_PLATFORMS_OPTIONS,
+      platforms: DEFAULT_PLATFORMS,
       baseCurrency: "USD",
       totalConvertedGross: 0,
       completedCount: 0,

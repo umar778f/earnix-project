@@ -40,67 +40,68 @@ export async function createExpenseAction(formData: FormData): Promise<ExpenseAc
   const exchangeRateDec = toDecimal(parsed.data.exchangeRate || 1.0)
   const convertedAmountDec = multiplyDecimals(originalAmountDec, exchangeRateDec)
 
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        return {
-          success: false,
-          error: "You must be signed in to log an expense.",
-        }
-      }
-
-      // Read user's default display currency
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("default_currency")
-        .eq("id", user.id)
-        .single()
-
-      const baseCurrency = profile?.default_currency || "USD"
-
-      const { data, error } = await supabase
-        .from("expenses")
-        .insert({
-          user_id: user.id,
-          title: parsed.data.title,
-          original_amount: originalAmountDec.toNumber(),
-          original_currency: parsed.data.originalCurrency,
-          exchange_rate: exchangeRateDec.toNumber(),
-          converted_amount: convertedAmountDec.toDecimalPlaces(4, Decimal.ROUND_HALF_UP).toNumber(),
-          converted_currency: baseCurrency,
-          category: parsed.data.category,
-          is_tax_deductible: parsed.data.isTaxDeductible,
-          tax_category: parsed.data.taxCategory || parsed.data.category,
-          expense_date: parsed.data.expenseDate,
-          document_id: parsed.data.documentId || null,
-          notes: parsed.data.notes || null,
-          ai_review_status: "unassigned",
-        })
-        .select("id")
-        .single()
-
-      if (error) {
-        return { success: false, error: error.message }
-      }
-
-      revalidatePath("/expenses")
-      revalidatePath("/dashboard")
-      revalidatePath("/tax")
-      return { success: true, id: data?.id }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to record expense"
-      return { success: false, error: msg }
+  if (!isSupabaseConfigured()) {
+    return {
+      success: false,
+      error: "Supabase credentials are not configured. Cannot record expense to database.",
     }
   }
 
-  // Guest/demo fallback
-  revalidatePath("/expenses")
-  return { success: true, id: `demo-exp-${Date.now()}` }
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return {
+        success: false,
+        error: "You must be signed in to log an expense.",
+      }
+    }
+
+    // Read user's default display currency
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("default_currency")
+      .eq("id", user.id)
+      .single()
+
+    const baseCurrency = profile?.default_currency || "USD"
+
+    const { data, error } = await supabase
+      .from("expenses")
+      .insert({
+        user_id: user.id,
+        title: parsed.data.title,
+        original_amount: originalAmountDec.toNumber(),
+        original_currency: parsed.data.originalCurrency,
+        exchange_rate: exchangeRateDec.toNumber(),
+        converted_amount: convertedAmountDec.toDecimalPlaces(4, Decimal.ROUND_HALF_UP).toNumber(),
+        converted_currency: baseCurrency,
+        category: parsed.data.category,
+        is_tax_deductible: parsed.data.isTaxDeductible,
+        tax_category: parsed.data.taxCategory || parsed.data.category,
+        expense_date: parsed.data.expenseDate,
+        document_id: parsed.data.documentId || null,
+        notes: parsed.data.notes || null,
+        ai_review_status: "unassigned",
+      })
+      .select("id")
+      .single()
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/expenses")
+    revalidatePath("/dashboard")
+    revalidatePath("/tax")
+    return { success: true, id: data?.id }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Failed to record expense"
+    return { success: false, error: msg }
+  }
 }
 
 export async function updateExpenseAction(formData: FormData): Promise<ExpenseActionResult> {
@@ -136,61 +137,63 @@ export async function updateExpenseAction(formData: FormData): Promise<ExpenseAc
   const exchangeRateDec = toDecimal(parsed.data.exchangeRate || 1.0)
   const convertedAmountDec = multiplyDecimals(originalAmountDec, exchangeRateDec)
 
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        return { success: false, error: "Authentication required." }
-      }
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("default_currency")
-        .eq("id", user.id)
-        .single()
-
-      const baseCurrency = profile?.default_currency || "USD"
-
-      const { error } = await supabase
-        .from("expenses")
-        .update({
-          title: parsed.data.title,
-          original_amount: originalAmountDec.toNumber(),
-          original_currency: parsed.data.originalCurrency,
-          exchange_rate: exchangeRateDec.toNumber(),
-          converted_amount: convertedAmountDec.toDecimalPlaces(4, Decimal.ROUND_HALF_UP).toNumber(),
-          converted_currency: baseCurrency,
-          category: parsed.data.category,
-          is_tax_deductible: parsed.data.isTaxDeductible,
-          tax_category: parsed.data.taxCategory || parsed.data.category,
-          expense_date: parsed.data.expenseDate,
-          document_id: parsed.data.documentId || null,
-          notes: parsed.data.notes || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", expenseId)
-        .eq("user_id", user.id)
-
-      if (error) {
-        return { success: false, error: error.message }
-      }
-
-      revalidatePath("/expenses")
-      revalidatePath("/dashboard")
-      revalidatePath("/tax")
-      return { success: true, id: expenseId }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to update expense"
-      return { success: false, error: msg }
+  if (!isSupabaseConfigured()) {
+    return {
+      success: false,
+      error: "Supabase credentials are not configured. Cannot update expense in database.",
     }
   }
 
-  revalidatePath("/expenses")
-  return { success: true, id: expenseId }
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return { success: false, error: "Authentication required." }
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("default_currency")
+      .eq("id", user.id)
+      .single()
+
+    const baseCurrency = profile?.default_currency || "USD"
+
+    const { error } = await supabase
+      .from("expenses")
+      .update({
+        title: parsed.data.title,
+        original_amount: originalAmountDec.toNumber(),
+        original_currency: parsed.data.originalCurrency,
+        exchange_rate: exchangeRateDec.toNumber(),
+        converted_amount: convertedAmountDec.toDecimalPlaces(4, Decimal.ROUND_HALF_UP).toNumber(),
+        converted_currency: baseCurrency,
+        category: parsed.data.category,
+        is_tax_deductible: parsed.data.isTaxDeductible,
+        tax_category: parsed.data.taxCategory || parsed.data.category,
+        expense_date: parsed.data.expenseDate,
+        document_id: parsed.data.documentId || null,
+        notes: parsed.data.notes || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", expenseId)
+      .eq("user_id", user.id)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/expenses")
+    revalidatePath("/dashboard")
+    revalidatePath("/tax")
+    return { success: true, id: expenseId }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Failed to update expense"
+    return { success: false, error: msg }
+  }
 }
 
 export async function deleteExpenseAction(id: string): Promise<ExpenseActionResult> {
@@ -198,37 +201,39 @@ export async function deleteExpenseAction(id: string): Promise<ExpenseActionResu
     return { success: false, error: "Missing expense ID" }
   }
 
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        return { success: false, error: "Authentication required." }
-      }
-
-      const { error } = await supabase
-        .from("expenses")
-        .delete()
-        .eq("id", id)
-        .eq("user_id", user.id)
-
-      if (error) {
-        return { success: false, error: error.message }
-      }
-
-      revalidatePath("/expenses")
-      revalidatePath("/dashboard")
-      revalidatePath("/tax")
-      return { success: true }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to delete expense"
-      return { success: false, error: msg }
+  if (!isSupabaseConfigured()) {
+    return {
+      success: false,
+      error: "Supabase credentials are not configured. Cannot delete expense from database.",
     }
   }
 
-  revalidatePath("/expenses")
-  return { success: true }
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return { success: false, error: "Authentication required." }
+    }
+
+    const { error } = await supabase
+      .from("expenses")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user.id)
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/expenses")
+    revalidatePath("/dashboard")
+    revalidatePath("/tax")
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Failed to delete expense"
+    return { success: false, error: msg }
+  }
 }

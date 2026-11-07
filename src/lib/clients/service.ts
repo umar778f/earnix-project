@@ -42,86 +42,18 @@ export interface ClientsPageData {
   isDemoData: boolean
 }
 
-export const DEMO_CLIENTS_LIST: ClientListItem[] = [
-  {
-    id: "demo-client-01",
-    name: "Acme Cloud Solutions",
-    email: "billing@acmecloud.io",
-    country: "United States",
-    platformId: "00000000-0000-0000-0000-000000000001",
-    platformCode: "upwork",
-    platformName: "Upwork",
-    notes: "Enterprise client for Next.js micro-frontend migrations. Bi-weekly milestone billing.",
-    totalEarningsConverted: 14200.0,
-    paymentCount: 8,
-    lastPaymentDate: "2026-11-02T14:30:00Z",
-    isDemo: true,
-  },
-  {
-    id: "demo-client-02",
-    name: "Nordic FinTech Labs",
-    email: "accounting@nordicfin.de",
-    country: "Germany",
-    platformId: "00000000-0000-0000-0000-000000000002",
-    platformCode: "generic_csv",
-    platformName: "Direct Invoice",
-    notes: "Full-stack European banking SaaS client. Retainer billed in EUR.",
-    totalEarningsConverted: 11500.0,
-    paymentCount: 5,
-    lastPaymentDate: "2026-10-28T09:15:00Z",
-    isDemo: true,
-  },
-  {
-    id: "demo-client-03",
-    name: "PixelCraft Studios",
-    email: "finance@pixelcraft.co.uk",
-    country: "United Kingdom",
-    platformId: "00000000-0000-0000-0000-000000000001",
-    platformCode: "upwork",
-    platformName: "Upwork",
-    notes: "Hourly design systems contract. Tracked via Upwork desktop time tracker.",
-    totalEarningsConverted: 5450.0,
-    paymentCount: 4,
-    lastPaymentDate: "2026-10-21T16:45:00Z",
-    isDemo: true,
-  },
-  {
-    id: "demo-client-04",
-    name: "Apex Retail Analytics",
-    email: "accounts@apexretail.ca",
-    country: "Canada",
-    platformId: "00000000-0000-0000-0000-000000000003",
-    platformCode: "manual",
-    platformName: "Direct Client",
-    notes: "PostgreSQL schema optimization & BI dashboard setup. Wire transfer payout.",
-    totalEarningsConverted: 3700.0,
-    paymentCount: 3,
-    lastPaymentDate: "2026-10-14T11:00:00Z",
-    isDemo: true,
-  },
-]
-
-export const DEMO_PLATFORMS = [
+export const DEFAULT_PLATFORMS = [
   { id: "00000000-0000-0000-0000-000000000001", code: "upwork", name: "Upwork" },
   { id: "00000000-0000-0000-0000-000000000002", code: "generic_csv", name: "Generic CSV Import" },
   { id: "00000000-0000-0000-0000-000000000003", code: "manual", name: "Direct Client / Manual" },
   { id: "00000000-0000-0000-0000-000000000004", code: "direct", name: "Direct Contract" },
 ]
 
-export async function getClientsData(options?: { preferDemo?: boolean }): Promise<ClientsPageData> {
-  if (options?.preferDemo) {
-    return {
-      clients: DEMO_CLIENTS_LIST,
-      platforms: DEMO_PLATFORMS,
-      baseCurrency: "USD",
-      isDemoData: false,
-    }
-  }
-
-  if (!isSupabaseConfigured()) {
+export async function getClientsData(): Promise<ClientsPageData> {
+    if (!isSupabaseConfigured()) {
     return {
       clients: [],
-      platforms: DEMO_PLATFORMS,
+      platforms: DEFAULT_PLATFORMS,
       baseCurrency: "USD",
       isDemoData: false,
     }
@@ -136,7 +68,7 @@ export async function getClientsData(options?: { preferDemo?: boolean }): Promis
     if (!user) {
       return {
         clients: [],
-        platforms: DEMO_PLATFORMS,
+        platforms: DEFAULT_PLATFORMS,
         baseCurrency: "USD",
         isDemoData: false,
       }
@@ -157,7 +89,7 @@ export async function getClientsData(options?: { preferDemo?: boolean }): Promis
       .select("id, code, name")
       .eq("is_active", true)
 
-    const platforms = platformsData && platformsData.length > 0 ? platformsData : DEMO_PLATFORMS
+    const platforms = platformsData && platformsData.length > 0 ? platformsData : DEFAULT_PLATFORMS
 
     // Fetch clients
     const { data: clientsData } = await supabase
@@ -243,7 +175,7 @@ export async function getClientsData(options?: { preferDemo?: boolean }): Promis
   } catch {
     return {
       clients: [],
-      platforms: DEMO_PLATFORMS,
+      platforms: DEFAULT_PLATFORMS,
       baseCurrency: "USD",
       isDemoData: false,
     }

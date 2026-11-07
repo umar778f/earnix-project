@@ -1,12 +1,10 @@
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { type NotificationType } from "@/types/database.types"
 import {
-  type NotificationItem,
-  DEMO_NOTIFICATIONS,
+  type NotificationItem
 } from "@/lib/notifications/types"
 
 export type { NotificationItem }
-export { DEMO_NOTIFICATIONS }
 
 export async function getUserNotifications(): Promise<{
   notifications: NotificationItem[]

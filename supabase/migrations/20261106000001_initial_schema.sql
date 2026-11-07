@@ -53,6 +53,14 @@ CREATE TABLE public.platforms (
     created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
+-- Seed initial platforms catalog
+INSERT INTO public.platforms (id, code, name, icon_name, is_active) VALUES
+    ('00000000-0000-0000-0000-000000000001', 'upwork', 'Upwork', 'Briefcase', true),
+    ('00000000-0000-0000-0000-000000000002', 'generic_csv', 'Generic CSV Import', 'FileSpreadsheet', true),
+    ('00000000-0000-0000-0000-000000000003', 'manual', 'Manual Entry', 'PlusCircle', true),
+    ('00000000-0000-0000-0000-000000000004', 'direct', 'Direct Client', 'UserCheck', true)
+ON CONFLICT (id) DO NOTHING;
+
 -- ------------------------------------------------------------------------------
 -- 4. CLIENTS TABLE (Client directory per freelancer)
 -- ------------------------------------------------------------------------------

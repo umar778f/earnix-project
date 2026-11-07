@@ -7,7 +7,6 @@ import {
   type MonthlyTrendItem,
   type PlatformDistributionItem,
   type CurrencyDistributionItem,
-  DEMO_DASHBOARD_DATA,
 } from "@/lib/dashboard/demo-data"
 
 interface JoinedPlatform {
@@ -103,15 +102,9 @@ export function createEmptyDashboard(baseCurrency: string = "USD"): DashboardDat
   }
 }
 
-export async function getDashboardData(options?: {
-  preferDemo?: boolean
-}): Promise<DashboardData> {
+export async function getDashboardData(): Promise<DashboardData> {
   // If explicitly requested via options, return demo fixtures
-  if (options?.preferDemo) {
-    return DEMO_DASHBOARD_DATA
-  }
-
-  // If Supabase is not configured, return an authentic clean zero-state dashboard
+    // If Supabase is not configured, return an authentic clean zero-state dashboard
   if (!isSupabaseConfigured()) {
     return createEmptyDashboard("USD")
   }
