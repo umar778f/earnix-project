@@ -95,5 +95,5 @@ npm run build
 
 ## License
 
-MIT
+[MIT](LICENSE) — Copyright (c) 2026 Umar Farooq
 
