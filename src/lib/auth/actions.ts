@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
+import { checkRateLimit } from "@/lib/security/rate-limit"
 import {
   loginSchema,
   signupSchema,
@@ -16,10 +18,31 @@ export type AuthActionResult = {
   message?: string
 }
 
+async function getClientIp(): Promise<string> {
+  try {
+    const headerList = await headers()
+    const forwarded = headerList.get("x-forwarded-for")
+    if (forwarded) {
+      return forwarded.split(",")[0].trim()
+    }
+    return headerList.get("x-real-ip") || "127.0.0.1"
+  } catch {
+    return "127.0.0.1"
+  }
+}
+
 export async function signInWithEmailAction(
   prevState: AuthActionResult | null,
   formData: FormData
 ): Promise<AuthActionResult> {
+  const clientIp = await getClientIp()
+  const rateLimit = checkRateLimit(`login:${clientIp}`, { maxRequests: 10, windowMs: 60 * 1000 })
+  if (!rateLimit.allowed) {
+    return {
+      success: false,
+      error: `Too many sign-in attempts. Please try again in ${rateLimit.resetInSeconds} seconds.`,
+    }
+  }
   if (!isSupabaseConfigured()) {
     return {
       success: false,
@@ -117,6 +140,15 @@ export async function sendPasswordResetAction(
   prevState: AuthActionResult | null,
   formData: FormData
 ): Promise<AuthActionResult> {
+  const clientIp = await getClientIp()
+  const rateLimit = checkRateLimit(`reset:${clientIp}`, { maxRequests: 3, windowMs: 60 * 1000 })
+  if (!rateLimit.allowed) {
+    return {
+      success: false,
+      error: `Too many password reset requests. Please try again in ${rateLimit.resetInSeconds} seconds.`,
+    }
+  }
+
   if (!isSupabaseConfigured()) {
     return {
       success: false,
@@ -161,6 +193,15 @@ export async function updatePasswordAction(
   prevState: AuthActionResult | null,
   formData: FormData
 ): Promise<AuthActionResult> {
+  const clientIp = await getClientIp()
+  const rateLimit = checkRateLimit(`update-pw:${clientIp}`, { maxRequests: 5, windowMs: 60 * 1000 })
+  if (!rateLimit.allowed) {
+    return {
+      success: false,
+      error: `Too many password update attempts. Please try again in ${rateLimit.resetInSeconds} seconds.`,
+    }
+  }
+
   if (!isSupabaseConfigured()) {
     return {
       success: false,

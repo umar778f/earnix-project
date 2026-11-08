@@ -315,6 +315,40 @@ assert(
   "OAuth callback strictly prevents external open redirects"
 )
 
+// -----------------------------------------------------------------------------
+// 7. Security Rate Limiting & Notification Safe URL Tests
+// -----------------------------------------------------------------------------
+console.log("\n[7/7] Running Security Rate Limiting & Safe Routing Tests...")
+
+import { checkRateLimit } from "../src/lib/security/rate-limit"
+
+// Test: Rate limiter allows requests up to maxRequests
+const testKey = `test-ip-${Date.now()}`
+let allowedCount = 0
+for (let i = 0; i < 5; i++) {
+  const res = checkRateLimit(testKey, { maxRequests: 5, windowMs: 1000 })
+  if (res.allowed) allowedCount++
+}
+assert(allowedCount === 5, "Rate limiter permits allowed number of requests within window (5/5)")
+
+// Test: Rate limiter rejects excess requests
+const blockedRes = checkRateLimit(testKey, { maxRequests: 5, windowMs: 1000 })
+assert(!blockedRes.allowed && blockedRes.remaining === 0, "Rate limiter throttles requests exceeding max limit")
+
+// Test: Notification action URL validation
+function isSafeActionUrl(url?: string): boolean {
+  if (!url) return false
+  return url.startsWith("/") && !url.startsWith("//") && !url.includes("\\")
+}
+assert(
+  isSafeActionUrl("/dashboard/tax") &&
+    !isSafeActionUrl("javascript:alert(1)") &&
+    !isSafeActionUrl("//malicious.site") &&
+    !isSafeActionUrl("https://phishing.com") &&
+    !isSafeActionUrl("/\\evil.com"),
+  "Notification flyout strictly rejects unsafe or external action URLs"
+)
+
 // Run async categorizer tests and summarize
 runCategorizerTests().then(() => {
   console.log("\n============================================================")

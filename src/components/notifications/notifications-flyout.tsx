@@ -29,6 +29,11 @@ interface NotificationsFlyoutProps {
   initialNotifications?: NotificationItem[]
 }
 
+function isSafeActionUrl(url?: string): boolean {
+  if (!url) return false
+  return url.startsWith("/") && !url.startsWith("//") && !url.includes("\\")
+}
+
 export function NotificationsFlyout({
   initialNotifications = [],
 }: NotificationsFlyoutProps) {
@@ -237,7 +242,7 @@ export function NotificationsFlyout({
                     <span>{notif.createdAt}</span>
 
                     <div className="flex items-center gap-1">
-                      {notif.actionUrl && (
+                      {notif.actionUrl && isSafeActionUrl(notif.actionUrl) && (
                         <Link
                           href={notif.actionUrl}
                           onClick={() => setIsOpen(false)}

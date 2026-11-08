@@ -45,7 +45,7 @@ Return ONLY valid JSON matching this exact structure:
 }`
 
       const response = await gemini.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash",
         contents: prompt,
       })
 
@@ -65,7 +65,7 @@ Return ONLY valid JSON matching this exact structure:
             suggestedCategory: validCategory.category,
             confidence: Math.min(Math.max(Number(parsed.confidence) || 0.85, 0.5), 0.98),
             reason: parsed.reason || `Classified as ${validCategory.category} by Gemini AI`,
-            aiModelUsed: "gemini-2.5-flash",
+            aiModelUsed: "gemini-2.0-flash",
           }
         }
       }
@@ -170,7 +170,7 @@ Return ONLY valid JSON matching this exact structure:
 }`
 
       const response = await gemini.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash",
         contents: prompt,
       })
 
@@ -192,7 +192,7 @@ Return ONLY valid JSON matching this exact structure:
             taxCategory: parsed.taxCategory || validCategory.taxCategory,
             isTaxDeductible: parsed.isTaxDeductible ?? true,
             reason: parsed.reason || `Classified as ${validCategory.category} by Gemini AI`,
-            aiModelUsed: "gemini-2.5-flash",
+            aiModelUsed: "gemini-2.0-flash",
           }
         }
       }

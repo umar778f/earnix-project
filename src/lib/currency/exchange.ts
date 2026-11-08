@@ -55,12 +55,13 @@ export async function getExchangeRate(
     }
   }
 
-  // 1. Try Live API with In-Memory Cache
+  // 1. Try Live API with In-Memory Cache (Bounded 5-second network timeout)
   const now = Date.now()
   if (!memoryRateCache || now - memoryRateCache.cachedAt > CACHE_TTL_MS) {
     try {
       const res = await fetch("https://api.frankfurter.app/latest?from=USD", {
         next: { revalidate: 21600 }, // 6 hours Next.js cache
+        signal: AbortSignal.timeout(5000), // Prevent slow external network hangs
       })
       if (res.ok) {
         const json = await res.json()

@@ -280,7 +280,7 @@ CRITICAL GROUNDING & SECURITY RULES:
 ${verifiedContext}`
 
       const response = await gemini.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash",
         contents: prompt,
       })
 
@@ -290,7 +290,7 @@ ${verifiedContext}`
           answer: response.text.trim().replace(/\*\*/g, ""),
           groundedMetrics,
           citations,
-          deterministicModel: "gemini-2.5-flash (Grounded in Verified Ledger)",
+          deterministicModel: "gemini-2.0-flash (Grounded in Verified Ledger)",
           timestamp: new Date().toISOString(),
         }
       }
