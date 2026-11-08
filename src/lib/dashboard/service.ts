@@ -1,4 +1,4 @@
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
+import { createClient, isSupabaseConfigured, getAuthenticatedUser, getUserProfile } from "@/lib/supabase/server"
 import { toDecimal, addDecimals, subtractDecimals, multiplyDecimals, divideDecimals } from "@/lib/currency/format"
 import {
   type DashboardData,
@@ -103,76 +103,65 @@ export function createEmptyDashboard(baseCurrency: string = "USD"): DashboardDat
 }
 
 export async function getDashboardData(): Promise<DashboardData> {
-  // If explicitly requested via options, return demo fixtures
-    // If Supabase is not configured, return an authentic clean zero-state dashboard
   if (!isSupabaseConfigured()) {
     return createEmptyDashboard("USD")
   }
 
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const user = await getAuthenticatedUser()
 
     if (!user) {
       return createEmptyDashboard("USD")
     }
 
-    // Query user profile
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("default_currency, tax_jurisdiction")
-      .eq("id", user.id)
-      .single()
+    const supabase = await createClient()
+
+    // Parallel fetch: profile (memoized), transactions, expenses, tax profile, and unread notifications
+    const [profile, transactionsResult, expensesResult, taxProfileResult, notificationsResult] =
+      await Promise.all([
+        getUserProfile(user.id),
+        supabase
+          .from("transactions")
+          .select(`
+            id,
+            reference_id,
+            original_amount,
+            original_currency,
+            exchange_rate,
+            converted_amount,
+            converted_currency,
+            payment_date,
+            description,
+            status,
+            source_type,
+            category,
+            client:clients(id, name, country),
+            platform:platforms(id, code, name)
+          `)
+          .eq("user_id", user.id)
+          .order("payment_date", { ascending: false }),
+        supabase
+          .from("expenses")
+          .select("id, converted_amount, expense_date, category, is_tax_deductible")
+          .eq("user_id", user.id),
+        supabase
+          .from("tax_profiles")
+          .select("estimated_tax_rate, withholding_tax_suffered")
+          .eq("user_id", user.id)
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from("notifications")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("is_read", false),
+      ])
 
     const baseCurrency = profile?.default_currency || "USD"
-
-    // Query transactions
-    const { data: transactions } = await supabase
-      .from("transactions")
-      .select(`
-        id,
-        reference_id,
-        original_amount,
-        original_currency,
-        exchange_rate,
-        converted_amount,
-        converted_currency,
-        payment_date,
-        description,
-        status,
-        source_type,
-        category,
-        client:clients(id, name, country),
-        platform:platforms(id, code, name)
-      `)
-      .eq("user_id", user.id)
-      .order("payment_date", { ascending: false })
-
-    // Query expenses
-    const { data: expenses } = await supabase
-      .from("expenses")
-      .select("id, converted_amount, expense_date, category, is_tax_deductible")
-      .eq("user_id", user.id)
-
-    // Query tax profile
-    const { data: taxProfile } = await supabase
-      .from("tax_profiles")
-      .select("estimated_tax_rate, withholding_tax_suffered")
-      .eq("user_id", user.id)
-      .limit(1)
-      .maybeSingle()
-
-    // Query unread notifications
-    const { count: unreadCount } = await supabase
-      .from("notifications")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("is_read", false)
-
-    const rawTransactions = transactions || []
-    const rawExpenses = expenses || []
+    const rawTransactions = transactionsResult.data || []
+    const rawExpenses = expensesResult.data || []
+    const taxProfile = taxProfileResult.data
+    const unreadCount = notificationsResult.count || 0
 
     const now = new Date()
     const currentYearNum = now.getFullYear()
@@ -319,7 +308,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       currencyDistribution,
       transactionCount: rawTransactions.length,
       expenseCount: rawExpenses.length,
-      unreadNotificationsCount: unreadCount || 0,
+      unreadNotificationsCount: unreadCount,
     }
   } catch {
     return createEmptyDashboard("USD")

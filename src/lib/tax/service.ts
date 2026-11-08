@@ -1,4 +1,4 @@
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
+import { createClient, isSupabaseConfigured, getAuthenticatedUser, getUserProfile } from "@/lib/supabase/server"
 import {
   calculateTaxReadyLedger,
   type TaxCalculationResults,
@@ -22,54 +22,40 @@ export async function getTaxPreparationSummary(
   requestedTaxYear: string = "2025-2026",
   requestedJurisdiction: string = "PK"
 ): Promise<TaxPreparationData> {
-  const [txData, expData] = await Promise.all([
+  const user = await getAuthenticatedUser()
+
+  // Parallel fetch: transactions, expenses, user profile (memoized), and tax profile
+  const [txData, expData, profile, taxProf] = await Promise.all([
     getTransactionsData(),
     getExpensesSummary(),
+    user ? getUserProfile(user.id) : null,
+    user && isSupabaseConfigured()
+      ? (async () => {
+          try {
+            const supabase = await createClient()
+            const { data } = await supabase
+              .from("tax_profiles")
+              .select("estimated_tax_rate, withholding_tax_suffered, jurisdiction_code")
+              .eq("user_id", user.id)
+              .eq("tax_year", requestedTaxYear)
+              .maybeSingle()
+            return data
+          } catch {
+            return null
+          }
+        })()
+      : null,
   ])
 
   let estimatedRate = SUPPORTED_TAX_JURISDICTIONS[requestedJurisdiction]?.defaultRate || 1.0
   let withholdingSuffered = 0
-  let businessName: string | null = null
-  let taxIdentifier: string | null = null
-  let baseCurrency = txData.baseCurrency || "USD"
+  const businessName: string | null = profile?.business_name || null
+  const taxIdentifier: string | null = profile?.tax_identifier || null
+  const baseCurrency = profile?.default_currency || txData.baseCurrency || "USD"
 
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (user) {
-        // Fetch profile
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("default_currency, tax_jurisdiction, business_name, tax_identifier")
-          .eq("id", user.id)
-          .single()
-
-        if (profile) {
-          baseCurrency = profile.default_currency || baseCurrency
-          businessName = profile.business_name
-          taxIdentifier = profile.tax_identifier
-        }
-
-        // Fetch tax profile
-        const { data: taxProf } = await supabase
-          .from("tax_profiles")
-          .select("estimated_tax_rate, withholding_tax_suffered, jurisdiction_code")
-          .eq("user_id", user.id)
-          .eq("tax_year", requestedTaxYear)
-          .single()
-
-        if (taxProf) {
-          estimatedRate = Number(taxProf.estimated_tax_rate)
-          withholdingSuffered = Number(taxProf.withholding_tax_suffered)
-        }
-      }
-    } catch {
-      // Fallback
-    }
+  if (taxProf) {
+    estimatedRate = Number(taxProf.estimated_tax_rate)
+    withholdingSuffered = Number(taxProf.withholding_tax_suffered)
   }
 
   const jurisdiction =
@@ -104,4 +90,3 @@ export async function getTaxPreparationSummary(
     calculations,
   }
 }
-

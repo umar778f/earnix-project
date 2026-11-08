@@ -1,7 +1,7 @@
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
-import { getUserNotifications } from "@/lib/notifications/service"
+import { getAuthenticatedUser, getUserProfile } from "@/lib/supabase/server"
+import { getUserNotifications, type NotificationItem } from "@/lib/notifications/service"
 
 interface AppShellProps {
   children: React.ReactNode
@@ -11,32 +11,24 @@ export async function AppShell({ children }: AppShellProps) {
   let userEmail: string | null = null
   let userName: string | null = null
   let baseCurrency = "USD"
+  let notifications: NotificationItem[] = []
 
-  const { notifications } = await getUserNotifications()
+  const user = await getAuthenticatedUser()
 
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (user) {
-        userEmail = user.email ?? null
-        userName = (user.user_metadata?.full_name as string) ?? null
+  if (user) {
+    userEmail = user.email ?? null
+    userName = (user.user_metadata?.full_name as string) ?? null
 
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("default_currency")
-          .eq("id", user.id)
-          .single()
+    // Parallel fetch: profile and notifications
+    const [profile, notifResult] = await Promise.all([
+      getUserProfile(user.id),
+      getUserNotifications(),
+    ])
 
-        if (profile?.default_currency) {
-          baseCurrency = profile.default_currency
-        }
-      }
-    } catch {
-      // Graceful fallback to guest mode if network or session check fails
+    if (profile?.default_currency) {
+      baseCurrency = profile.default_currency
     }
+    notifications = notifResult.notifications
   }
 
   return (

@@ -281,24 +281,24 @@ export async function commitImportBatchAction(
         existingClients.forEach((c) => clientMap.set(c.name.toLowerCase(), c.id))
       }
 
-      // Create clients that don't exist yet
-      for (const name of uniqueClientNames) {
-        if (!clientMap.has(name.toLowerCase())) {
-          const { data: newClient, error: clientErr } = await supabase
-            .from("clients")
-            .insert({
+      // Create clients that don't exist yet in a single batch
+      const missingClientNames = uniqueClientNames.filter((name) => !clientMap.has(name.toLowerCase()))
+      if (missingClientNames.length > 0) {
+        const { data: newClients, error: clientErr } = await supabase
+          .from("clients")
+          .insert(
+            missingClientNames.map((name) => ({
               user_id: user.id,
               name,
               default_platform_id: platformId,
               notes: `Auto-created from ${platformCode === "upwork" ? "Upwork" : "Generic"} statement import.`,
-            })
-            .select("id")
-            .single()
+            }))
+          )
+          .select("id, name")
 
-          if (!clientErr && newClient) {
-            clientMap.set(name.toLowerCase(), newClient.id)
-            newClientsCount++
-          }
+        if (!clientErr && newClients) {
+          newClients.forEach((nc) => clientMap.set(nc.name.toLowerCase(), nc.id))
+          newClientsCount = newClients.length
         }
       }
 

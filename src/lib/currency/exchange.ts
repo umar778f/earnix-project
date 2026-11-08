@@ -55,13 +55,13 @@ export async function getExchangeRate(
     }
   }
 
-  // 1. Try Live API with In-Memory Cache (Bounded 5-second network timeout)
+  // 1. Try Live API with In-Memory Cache (Bounded 2.5-second network timeout to fail fast)
   const now = Date.now()
   if (!memoryRateCache || now - memoryRateCache.cachedAt > CACHE_TTL_MS) {
     try {
       const res = await fetch("https://api.frankfurter.app/latest?from=USD", {
         next: { revalidate: 21600 }, // 6 hours Next.js cache
-        signal: AbortSignal.timeout(5000), // Prevent slow external network hangs
+        signal: AbortSignal.timeout(2500), // Fail fast to static benchmarks to avoid cold network stalls
       })
       if (res.ok) {
         const json = await res.json()
@@ -69,7 +69,7 @@ export async function getExchangeRate(
           USD: 1.0,
           EUR: json.rates?.EUR || BENCHMARK_RATES_TO_USD.EUR,
           GBP: json.rates?.GBP || BENCHMARK_RATES_TO_USD.GBP,
-          PKR: BENCHMARK_RATES_TO_USD.PKR, // Open Frankfurter doesn't list PKR; supplement with SBP benchmark
+          PKR: BENCHMARK_RATES_TO_USD.PKR, // Supplement with SBP benchmark
         }
         memoryRateCache = {
           rates: fetchedRates,
@@ -81,7 +81,8 @@ export async function getExchangeRate(
     }
   }
 
-  const activeRates: Record<string, number> = memoryRateCache?.rates || (BENCHMARK_RATES_TO_USD as Record<string, number>)
+  const activeRates: Record<string, number> =
+    memoryRateCache?.rates || (BENCHMARK_RATES_TO_USD as Record<string, number>)
 
   // Calculate cross-rate: (1 USD in Target) / (1 USD in From)
   const fromInUsd = activeRates[from] ?? (BENCHMARK_RATES_TO_USD as Record<string, number>)[from] ?? 1.0
@@ -90,23 +91,24 @@ export async function getExchangeRate(
   const calculatedRateDec = divideDecimals(toDecimal(toInUsd), toDecimal(fromInUsd))
   const calculatedRate = calculatedRateDec.toDecimalPlaces(6, Decimal.ROUND_HALF_UP).toNumber()
 
-  // 2. Cache snapshot asynchronously to Supabase if configured
+  // 2. Cache snapshot asynchronously to Supabase without blocking the client response
   if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createClient()
-      await supabase.from("exchange_rates").upsert(
-        {
-          base_currency: from,
-          target_currency: to,
-          rate: calculatedRate,
-          rate_date: todayStr,
-          source: memoryRateCache ? "frankfurter_ecb" : "seed_benchmark",
-        },
-        { onConflict: "base_currency,target_currency,rate_date" }
+    createClient()
+      .then((supabase) =>
+        supabase.from("exchange_rates").upsert(
+          {
+            base_currency: from,
+            target_currency: to,
+            rate: calculatedRate,
+            rate_date: todayStr,
+            source: memoryRateCache ? "frankfurter_ecb" : "seed_benchmark",
+          },
+          { onConflict: "base_currency,target_currency,rate_date" }
+        )
       )
-    } catch {
-      // Non-blocking cache failure
-    }
+      .catch(() => {
+        // Non-blocking background cache failure
+      })
   }
 
   return {

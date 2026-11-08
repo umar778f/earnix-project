@@ -26,6 +26,7 @@ function NavList({ items, onNavigate, className }: NavListProps) {
           <Link
             key={item.href}
             href={item.href}
+            prefetch={true}
             onClick={onNavigate}
             aria-current={isActive ? "page" : undefined}
             className={cn(

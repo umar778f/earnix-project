@@ -1,4 +1,4 @@
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
+import { createClient, isSupabaseConfigured, getAuthenticatedUser, getUserProfile } from "@/lib/supabase/server"
 import { toDecimal, addDecimals } from "@/lib/currency/format"
 import { type SourceType, type TransactionStatus } from "@/types/database.types"
 
@@ -73,10 +73,7 @@ export async function getTransactionsData(): Promise<TransactionsPageData> {
   }
 
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const user = await getAuthenticatedUser()
 
     if (!user) {
       return {
@@ -91,66 +88,57 @@ export async function getTransactionsData(): Promise<TransactionsPageData> {
       }
     }
 
-    // Query user profile
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("default_currency")
-      .eq("id", user.id)
-      .single()
+    const supabase = await createClient()
+
+    // Parallel fetch: profile (memoized), platforms, clients, and transactions
+    const [profile, platformsResult, clientsResult, transactionsResult] = await Promise.all([
+      getUserProfile(user.id),
+      supabase.from("platforms").select("id, code, name").eq("is_active", true),
+      supabase
+        .from("clients")
+        .select("id, name")
+        .eq("user_id", user.id)
+        .order("name", { ascending: true }),
+      supabase
+        .from("transactions")
+        .select(`
+          id,
+          reference_id,
+          client_id,
+          platform_id,
+          original_amount,
+          original_currency,
+          exchange_rate,
+          converted_amount,
+          converted_currency,
+          conversion_date,
+          conversion_source,
+          payment_date,
+          description,
+          status,
+          source_type,
+          category,
+          ai_review_status,
+          ai_confidence,
+          metadata,
+          created_at,
+          client:clients(id, name),
+          platform:platforms(id, code, name)
+        `)
+        .eq("user_id", user.id)
+        .order("payment_date", { ascending: false }),
+    ])
 
     const baseCurrency = profile?.default_currency || "USD"
-
-    // Query platforms
-    const { data: platformsData } = await supabase
-      .from("platforms")
-      .select("id, code, name")
-      .eq("is_active", true)
-
-    const platforms = platformsData && platformsData.length > 0 ? platformsData : DEFAULT_PLATFORMS
-
-    // Query clients
-    const { data: clientsData } = await supabase
-      .from("clients")
-      .select("id, name")
-      .eq("user_id", user.id)
-      .order("name", { ascending: true })
-
-    const clients = clientsData || []
-
-    // Query transactions
-    const { data: transactionsData } = await supabase
-      .from("transactions")
-      .select(`
-        id,
-        reference_id,
-        client_id,
-        platform_id,
-        original_amount,
-        original_currency,
-        exchange_rate,
-        converted_amount,
-        converted_currency,
-        conversion_date,
-        conversion_source,
-        payment_date,
-        description,
-        status,
-        source_type,
-        category,
-        ai_review_status,
-        ai_confidence,
-        metadata,
-        created_at,
-        client:clients(id, name),
-        platform:platforms(id, code, name)
-      `)
-      .eq("user_id", user.id)
-      .order("payment_date", { ascending: false })
+    const platforms =
+      platformsResult.data && platformsResult.data.length > 0 ? platformsResult.data : DEFAULT_PLATFORMS
+    const clients = clientsResult.data || []
+    const transactionsData = transactionsResult.data || []
 
     if (!transactionsData || transactionsData.length === 0) {
       return {
         transactions: [],
-        clients: clientsData || [],
+        clients,
         platforms,
         baseCurrency,
         totalConvertedGross: 0,

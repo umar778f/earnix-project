@@ -1,4 +1,4 @@
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
+import { createClient, isSupabaseConfigured, getAuthenticatedUser, getUserProfile } from "@/lib/supabase/server"
 import { toDecimal, addDecimals } from "@/lib/currency/format"
 
 interface JoinedPlatform {
@@ -50,7 +50,7 @@ export const DEFAULT_PLATFORMS = [
 ]
 
 export async function getClientsData(): Promise<ClientsPageData> {
-    if (!isSupabaseConfigured()) {
+  if (!isSupabaseConfigured()) {
     return {
       clients: [],
       platforms: DEFAULT_PLATFORMS,
@@ -60,10 +60,7 @@ export async function getClientsData(): Promise<ClientsPageData> {
   }
 
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const user = await getAuthenticatedUser()
 
     if (!user) {
       return {
@@ -74,38 +71,36 @@ export async function getClientsData(): Promise<ClientsPageData> {
       }
     }
 
-    // Fetch user base currency
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("default_currency")
-      .eq("id", user.id)
-      .single()
+    const supabase = await createClient()
+
+    // Parallel fetch: profile (memoized), platforms, clients, and transactions
+    const [profile, platformsResult, clientsResult, transactionsResult] = await Promise.all([
+      getUserProfile(user.id),
+      supabase.from("platforms").select("id, code, name").eq("is_active", true),
+      supabase
+        .from("clients")
+        .select(`
+          id,
+          name,
+          email,
+          country,
+          default_platform_id,
+          notes,
+          created_at,
+          platform:platforms(id, code, name)
+        `)
+        .eq("user_id", user.id)
+        .order("name", { ascending: true }),
+      supabase
+        .from("transactions")
+        .select("id, client_id, converted_amount, payment_date, status")
+        .eq("user_id", user.id),
+    ])
 
     const baseCurrency = profile?.default_currency || "USD"
-
-    // Fetch active platforms catalog
-    const { data: platformsData } = await supabase
-      .from("platforms")
-      .select("id, code, name")
-      .eq("is_active", true)
-
-    const platforms = platformsData && platformsData.length > 0 ? platformsData : DEFAULT_PLATFORMS
-
-    // Fetch clients
-    const { data: clientsData } = await supabase
-      .from("clients")
-      .select(`
-        id,
-        name,
-        email,
-        country,
-        default_platform_id,
-        notes,
-        created_at,
-        platform:platforms(id, code, name)
-      `)
-      .eq("user_id", user.id)
-      .order("name", { ascending: true })
+    const platforms =
+      platformsResult.data && platformsResult.data.length > 0 ? platformsResult.data : DEFAULT_PLATFORMS
+    const clientsData = clientsResult.data || []
 
     if (!clientsData || clientsData.length === 0) {
       return {
@@ -116,32 +111,25 @@ export async function getClientsData(): Promise<ClientsPageData> {
       }
     }
 
-    // Fetch transactions grouped by client to calculate lifetime value
-    const { data: transactions } = await supabase
-      .from("transactions")
-      .select("id, client_id, converted_amount, payment_date, status")
-      .eq("user_id", user.id)
-
+    const transactions = transactionsResult.data || []
     const clientStats: Record<string, { total: number; count: number; lastDate: string | null }> = {}
 
-    if (transactions) {
-      for (const tx of transactions) {
-        if (!tx.client_id) continue
-        if (!clientStats[tx.client_id]) {
-          clientStats[tx.client_id] = { total: 0, count: 0, lastDate: null }
-        }
-        if (tx.status === "completed") {
-          clientStats[tx.client_id].total = addDecimals(
-            toDecimal(clientStats[tx.client_id].total),
-            toDecimal(tx.converted_amount)
-          ).toNumber()
-          clientStats[tx.client_id].count += 1
-          if (
-            !clientStats[tx.client_id].lastDate ||
-            new Date(tx.payment_date) > new Date(clientStats[tx.client_id].lastDate!)
-          ) {
-            clientStats[tx.client_id].lastDate = tx.payment_date
-          }
+    for (const tx of transactions) {
+      if (!tx.client_id) continue
+      if (!clientStats[tx.client_id]) {
+        clientStats[tx.client_id] = { total: 0, count: 0, lastDate: null }
+      }
+      if (tx.status === "completed") {
+        clientStats[tx.client_id].total = addDecimals(
+          toDecimal(clientStats[tx.client_id].total),
+          toDecimal(tx.converted_amount)
+        ).toNumber()
+        clientStats[tx.client_id].count += 1
+        if (
+          !clientStats[tx.client_id].lastDate ||
+          new Date(tx.payment_date) > new Date(clientStats[tx.client_id].lastDate!)
+        ) {
+          clientStats[tx.client_id].lastDate = tx.payment_date
         }
       }
     }
@@ -181,4 +169,3 @@ export async function getClientsData(): Promise<ClientsPageData> {
     }
   }
 }
-

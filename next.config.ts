@@ -24,7 +24,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  compress: true,
+  poweredByHeader: false,
   turbopack: {
     rules: {
       "*.css": {

@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
+import { createClient, isSupabaseConfigured, getAuthenticatedUser } from "@/lib/supabase/server"
 import { SUPPORTED_CURRENCIES, type SupportedCurrency, getExchangeRate } from "@/lib/currency/exchange"
 
 export type CurrencyActionResult = {
@@ -22,12 +22,10 @@ export async function updateBaseCurrencyAction(newCurrency: string): Promise<Cur
 
   if (isSupabaseConfigured()) {
     try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const user = await getAuthenticatedUser()
 
       if (user) {
+        const supabase = await createClient()
         const { error } = await supabase
           .from("profiles")
           .update({
@@ -52,12 +50,8 @@ export async function updateBaseCurrencyAction(newCurrency: string): Promise<Cur
     }
   }
 
-  revalidatePath("/", "layout")
-  revalidatePath("/dashboard")
-  revalidatePath("/transactions")
-  revalidatePath("/clients")
-  revalidatePath("/settings")
-  revalidatePath("/tax")
+  // Revalidate top-level dashboard layout once
+  revalidatePath("/dashboard", "layout")
 
   return {
     success: true,
@@ -67,14 +61,14 @@ export async function updateBaseCurrencyAction(newCurrency: string): Promise<Cur
 
 export async function refreshExchangeRatesAction(): Promise<CurrencyActionResult> {
   try {
-    // Refresh pairs against USD
-    await getExchangeRate("USD", "PKR")
-    await getExchangeRate("EUR", "USD")
-    await getExchangeRate("GBP", "USD")
+    // Refresh pairs against USD in parallel
+    await Promise.all([
+      getExchangeRate("USD", "PKR"),
+      getExchangeRate("EUR", "USD"),
+      getExchangeRate("GBP", "USD"),
+    ])
 
-    revalidatePath("/dashboard")
-    revalidatePath("/transactions")
-    revalidatePath("/settings")
+    revalidatePath("/dashboard", "layout")
 
     return {
       success: true,
@@ -88,4 +82,3 @@ export async function refreshExchangeRatesAction(): Promise<CurrencyActionResult
     }
   }
 }
-

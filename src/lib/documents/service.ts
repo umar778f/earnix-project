@@ -1,4 +1,4 @@
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
+import { createClient, isSupabaseConfigured, getAuthenticatedUser } from "@/lib/supabase/server"
 import { type DocumentType } from "@/lib/documents/schemas"
 import { formatBytes } from "@/lib/utils"
 
@@ -40,12 +40,10 @@ export interface ReceiptOption {
 export async function getDocumentsSummary(): Promise<DocumentsSummary> {
   if (isSupabaseConfigured()) {
     try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const user = await getAuthenticatedUser()
 
       if (user) {
+        const supabase = await createClient()
         const { data: docs, error } = await supabase
           .from("documents")
           .select("*")
@@ -53,33 +51,40 @@ export async function getDocumentsSummary(): Promise<DocumentsSummary> {
           .order("created_at", { ascending: false })
 
         if (!error && docs) {
-          // Generate signed download URLs in parallel
-          const docsWithUrls: DocumentVaultItem[] = await Promise.all(
-            docs.map(async (d) => {
-              let signedUrl: string | null = null
-              try {
-                const { data } = await supabase.storage
-                  .from("documents")
-                  .createSignedUrl(d.storage_path, 3600) // 1-hour expiry
-                signedUrl = data?.signedUrl || null
-              } catch {
-                signedUrl = null
-              }
+          // Batch fetch signed download URLs in a SINGLE call rather than N sequential network roundtrips
+          const signedUrlMap = new Map<string, string>()
 
-              return {
-                id: d.id,
-                fileName: d.file_name,
-                storagePath: d.storage_path,
-                mimeType: d.mime_type,
-                fileSizeBytes: Number(d.file_size_bytes),
-                documentType: d.document_type as DocumentType,
-                ocrStatus: d.ocr_status as DocumentVaultItem["ocrStatus"],
-                ocrExtractedData: (d.ocr_extracted_data as Record<string, unknown>) || {},
-                createdAt: d.created_at,
-                signedUrl,
+          if (docs.length > 0) {
+            try {
+              const paths = docs.map((d) => d.storage_path)
+              const { data: signedData } = await supabase.storage
+                .from("documents")
+                .createSignedUrls(paths, 3600) // 1-hour expiry
+
+              if (signedData) {
+                signedData.forEach((item) => {
+                  if (item.signedUrl && item.path) {
+                    signedUrlMap.set(item.path, item.signedUrl)
+                  }
+                })
               }
-            })
-          )
+            } catch {
+              // Graceful fallback if storage batch signing is unavailable
+            }
+          }
+
+          const docsWithUrls: DocumentVaultItem[] = docs.map((d) => ({
+            id: d.id,
+            fileName: d.file_name,
+            storagePath: d.storage_path,
+            mimeType: d.mime_type,
+            fileSizeBytes: Number(d.file_size_bytes),
+            documentType: d.document_type as DocumentType,
+            ocrStatus: d.ocr_status as DocumentVaultItem["ocrStatus"],
+            ocrExtractedData: (d.ocr_extracted_data as Record<string, unknown>) || {},
+            createdAt: d.created_at,
+            signedUrl: signedUrlMap.get(d.storage_path) || null,
+          }))
 
           return computeDocumentsSummary(docsWithUrls, false)
         }
@@ -95,12 +100,10 @@ export async function getDocumentsSummary(): Promise<DocumentsSummary> {
 export async function getUserReceiptOptions(): Promise<ReceiptOption[]> {
   if (isSupabaseConfigured()) {
     try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const user = await getAuthenticatedUser()
 
       if (user) {
+        const supabase = await createClient()
         const { data, error } = await supabase
           .from("documents")
           .select("id, file_name, document_type")

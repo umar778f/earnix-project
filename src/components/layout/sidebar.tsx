@@ -19,6 +19,7 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
       <div className="flex h-14 items-center justify-between px-4 border-b border-border">
         <Link
           href="/dashboard"
+          prefetch={true}
           className="flex items-center gap-2 font-semibold text-foreground tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md px-1"
         >
           <div className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">

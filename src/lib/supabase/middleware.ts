@@ -14,6 +14,56 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse
   }
 
+  // Do not run auth validation for static assets, metadata files, or api routes
+  const { pathname } = request.nextUrl
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".")
+  ) {
+    return supabaseResponse
+  }
+
+  const isAuthRoute =
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password")
+
+  const isDashboardRoute =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/transactions") ||
+    pathname.startsWith("/clients") ||
+    pathname.startsWith("/expenses") ||
+    pathname.startsWith("/documents") ||
+    pathname.startsWith("/tax") ||
+    pathname.startsWith("/copilot") ||
+    pathname.startsWith("/settings")
+
+  // Performance optimization: For public routes (like the landing page '/'),
+  // no session refresh or redirect logic is needed. Return immediately without network roundtrips.
+  if (!isAuthRoute && !isDashboardRoute) {
+    return supabaseResponse
+  }
+
+  // Check if any Supabase authentication cookies exist
+  const allCookies = request.cookies.getAll()
+  const hasAuthCookie = allCookies.some((c) => c.name.startsWith("sb-"))
+
+  // Fast path: Unauthenticated visitor accessing protected dashboard routes without cookies
+  if (!hasAuthCookie && isDashboardRoute) {
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = "/login"
+    redirectUrl.searchParams.set("next", pathname)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  // Fast path: Unauthenticated visitor accessing login/signup without cookies
+  if (!hasAuthCookie && isAuthRoute) {
+    return supabaseResponse
+  }
+
+  // User has auth cookies and is on an auth or dashboard route: validate session
   const supabase = createServerClient(url, anonKey, {
     cookies: {
       getAll() {
@@ -33,36 +83,10 @@ export async function updateSession(request: NextRequest) {
     },
   })
 
-  // Do not run auth validation for static assets or api routes
-  const { pathname } = request.nextUrl
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api") ||
-    pathname.includes(".")
-  ) {
-    return supabaseResponse
-  }
-
   // Fetch the authenticated user from the refreshed session
   const {
     data: { user },
   } = await supabase.auth.getUser()
-
-  const isAuthRoute =
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/signup") ||
-    pathname.startsWith("/forgot-password") ||
-    pathname.startsWith("/reset-password")
-
-  const isDashboardRoute =
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/transactions") ||
-    pathname.startsWith("/clients") ||
-    pathname.startsWith("/expenses") ||
-    pathname.startsWith("/documents") ||
-    pathname.startsWith("/tax") ||
-    pathname.startsWith("/copilot") ||
-    pathname.startsWith("/settings")
 
   // Unauthenticated user attempting to access dashboard
   if (!user && isDashboardRoute) {
@@ -81,4 +105,3 @@ export async function updateSession(request: NextRequest) {
 
   return supabaseResponse
 }
-

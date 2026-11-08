@@ -1,4 +1,4 @@
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
+import { createClient, isSupabaseConfigured, getAuthenticatedUser, getUserProfile } from "@/lib/supabase/server"
 import { toDecimal, addDecimals, subtractDecimals, divideDecimals } from "@/lib/currency/format"
 import Decimal from "decimal.js"
 
@@ -42,50 +42,45 @@ export interface ExpensesSummary {
 export async function getExpensesSummary(): Promise<ExpensesSummary> {
   if (isSupabaseConfigured()) {
     try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const user = await getAuthenticatedUser()
 
       if (user) {
-        // Fetch user default currency
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("default_currency")
-          .eq("id", user.id)
-          .single()
+        const supabase = await createClient()
+
+        // Parallel fetch: profile (memoized) and expenses with attached document metadata
+        const [profile, expensesResult] = await Promise.all([
+          getUserProfile(user.id),
+          supabase
+            .from("expenses")
+            .select(`
+              id,
+              title,
+              original_amount,
+              original_currency,
+              exchange_rate,
+              converted_amount,
+              converted_currency,
+              category,
+              is_tax_deductible,
+              tax_category,
+              expense_date,
+              document_id,
+              notes,
+              ai_review_status,
+              documents (
+                file_name
+              )
+            `)
+            .eq("user_id", user.id)
+            .order("expense_date", { ascending: false }),
+        ])
 
         const baseCurrency = profile?.default_currency || "USD"
-
-        // Fetch user expenses with attached document metadata
-        const { data: expenses, error } = await supabase
-          .from("expenses")
-          .select(`
-            id,
-            title,
-            original_amount,
-            original_currency,
-            exchange_rate,
-            converted_amount,
-            converted_currency,
-            category,
-            is_tax_deductible,
-            tax_category,
-            expense_date,
-            document_id,
-            notes,
-            ai_review_status,
-            documents (
-              file_name
-            )
-          `)
-          .eq("user_id", user.id)
-          .order("expense_date", { ascending: false })
+        const { data: expenses, error } = expensesResult
 
         if (!error && expenses) {
           return computeExpensesSummary(
             expenses.map((e) => {
-              // Supabase join typing
               const doc = e.documents as { file_name?: string } | null
               return {
                 id: e.id,
@@ -183,4 +178,3 @@ function computeExpensesSummary(
     expenses,
   }
 }
-

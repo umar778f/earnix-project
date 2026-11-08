@@ -1,23 +1,20 @@
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
+import { createClient, isSupabaseConfigured, getAuthenticatedUser } from "@/lib/supabase/server"
 import { type NotificationType } from "@/types/database.types"
-import {
-  type NotificationItem
-} from "@/lib/notifications/types"
+import { type NotificationItem } from "@/lib/notifications/types"
+import { cache } from "react"
 
 export type { NotificationItem }
 
-export async function getUserNotifications(): Promise<{
+export const getUserNotifications = cache(async (): Promise<{
   notifications: NotificationItem[]
   unreadCount: number
-}> {
+}> => {
   if (isSupabaseConfigured()) {
     try {
-      const supabase = await createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const user = await getAuthenticatedUser()
 
       if (user) {
+        const supabase = await createClient()
         const { data, error } = await supabase
           .from("notifications")
           .select("id, title, message, type, is_read, action_url, created_at")
@@ -46,7 +43,7 @@ export async function getUserNotifications(): Promise<{
   }
 
   return { notifications: [], unreadCount: 0 }
-}
+})
 
 function formatRelativeTime(isoString: string): string {
   try {

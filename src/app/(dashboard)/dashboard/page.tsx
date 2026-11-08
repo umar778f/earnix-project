@@ -29,6 +29,7 @@ export default async function DashboardPage() {
       >
         <Link
           href="/transactions"
+          prefetch={true}
           className={cn(buttonVariants({ variant: "outline", size: "sm" }), "text-xs gap-1.5")}
         >
           <UploadCloud className="size-3.5" />
@@ -36,6 +37,7 @@ export default async function DashboardPage() {
         </Link>
         <Link
           href="/tax"
+          prefetch={true}
           className={cn(buttonVariants({ variant: "default", size: "sm" }), "text-xs gap-1.5")}
         >
           <FileText className="size-3.5" />
@@ -90,6 +92,7 @@ export default async function DashboardPage() {
               </div>
               <Link
                 href="/transactions"
+                prefetch={true}
                 className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
               >
                 <span>Full Ledger</span>
