@@ -1,5 +1,6 @@
 import { createClient, isSupabaseConfigured, getAuthenticatedUser, getUserProfile } from "@/lib/supabase/server"
 import { toDecimal, addDecimals, subtractDecimals, multiplyDecimals, divideDecimals } from "@/lib/currency/format"
+import { normalizeMonetaryAmountToTarget } from "@/lib/currency/normalization"
 import {
   type DashboardData,
   type DashboardTransactionItem,
@@ -142,7 +143,7 @@ export async function getDashboardData(): Promise<DashboardData> {
           .order("payment_date", { ascending: false }),
         supabase
           .from("expenses")
-          .select("id, converted_amount, expense_date, category, is_tax_deductible")
+          .select("id, original_amount, original_currency, converted_amount, converted_currency, exchange_rate, expense_date, category, is_tax_deductible")
           .eq("user_id", user.id),
         supabase
           .from("tax_profiles")
@@ -178,7 +179,16 @@ export async function getDashboardData(): Promise<DashboardData> {
     const mappedTransactions: DashboardTransactionItem[] = []
 
     for (const tx of rawTransactions) {
-      const amountDec = toDecimal(tx.converted_amount)
+      const amountDec = normalizeMonetaryAmountToTarget(
+        {
+          original_amount: tx.original_amount,
+          original_currency: tx.original_currency,
+          converted_amount: tx.converted_amount,
+          converted_currency: tx.converted_currency,
+          exchange_rate: tx.exchange_rate,
+        },
+        baseCurrency
+      )
       const txDate = new Date(tx.payment_date)
 
       // Only count completed transactions towards gross metrics
@@ -250,7 +260,17 @@ export async function getDashboardData(): Promise<DashboardData> {
     // Expenses aggregation
     let totalExpensesDec = toDecimal(0)
     for (const exp of rawExpenses) {
-      totalExpensesDec = addDecimals(totalExpensesDec, toDecimal(exp.converted_amount))
+      const expAmountDec = normalizeMonetaryAmountToTarget(
+        {
+          original_amount: exp.original_amount,
+          original_currency: exp.original_currency,
+          converted_amount: exp.converted_amount,
+          converted_currency: exp.converted_currency,
+          exchange_rate: exp.exchange_rate,
+        },
+        baseCurrency
+      )
+      totalExpensesDec = addDecimals(totalExpensesDec, expAmountDec)
     }
 
     const netIncomeDec = subtractDecimals(grossDec, totalExpensesDec)

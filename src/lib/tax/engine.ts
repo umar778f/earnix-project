@@ -102,8 +102,18 @@ export function calculateTaxReadyLedger(params: {
   }>
   estimatedTaxRate: number
   withholdingTaxSuffered?: number
+  taxYearCycle?: "july_june" | "calendar"
+  jurisdictionCode?: string
 }): TaxCalculationResults {
-  const { transactions, expenses, estimatedTaxRate, withholdingTaxSuffered = 0 } = params
+  const {
+    transactions,
+    expenses,
+    estimatedTaxRate,
+    withholdingTaxSuffered = 0,
+    taxYearCycle = params.jurisdictionCode
+      ? SUPPORTED_TAX_JURISDICTIONS[params.jurisdictionCode]?.taxYearCycle || "july_june"
+      : "july_june",
+  } = params
 
   let grossIncomeDec = new Decimal(0)
   for (const t of transactions) {
@@ -193,6 +203,7 @@ export function calculateTaxReadyLedger(params: {
     transactions,
     expenses,
     estimatedTaxRate,
+    taxYearCycle,
   })
 
   return {
@@ -211,19 +222,28 @@ export function calculateTaxReadyLedger(params: {
   }
 }
 
-function computeQuarterlyBreakdown(params: {
+export function computeQuarterlyBreakdown(params: {
   transactions: Array<{ convertedAmount: number; paymentDate: string; status: string }>
   expenses: Array<{ convertedAmount: number; isTaxDeductible: boolean; expenseDate: string }>
   estimatedTaxRate: number
+  taxYearCycle?: "july_june" | "calendar"
 }): QuarterlySummaryItem[] {
-  const { transactions, expenses, estimatedTaxRate } = params
+  const { transactions, expenses, estimatedTaxRate, taxYearCycle = "july_june" } = params
 
-  const quarters = [
-    { key: "Q1", label: "Q1 (Jul - Sep)", startMonth: 7, endMonth: 9 },
-    { key: "Q2", label: "Q2 (Oct - Dec)", startMonth: 10, endMonth: 12 },
-    { key: "Q3", label: "Q3 (Jan - Mar)", startMonth: 1, endMonth: 3 },
-    { key: "Q4", label: "Q4 (Apr - Jun)", startMonth: 4, endMonth: 6 },
-  ]
+  const quarters =
+    taxYearCycle === "calendar"
+      ? [
+          { key: "Q1", label: "Q1 (Jan - Mar)", startMonth: 1, endMonth: 3 },
+          { key: "Q2", label: "Q2 (Apr - Jun)", startMonth: 4, endMonth: 6 },
+          { key: "Q3", label: "Q3 (Jul - Sep)", startMonth: 7, endMonth: 9 },
+          { key: "Q4", label: "Q4 (Oct - Dec)", startMonth: 10, endMonth: 12 },
+        ]
+      : [
+          { key: "Q1", label: "Q1 (Jul - Sep)", startMonth: 7, endMonth: 9 },
+          { key: "Q2", label: "Q2 (Oct - Dec)", startMonth: 10, endMonth: 12 },
+          { key: "Q3", label: "Q3 (Jan - Mar)", startMonth: 1, endMonth: 3 },
+          { key: "Q4", label: "Q4 (Apr - Jun)", startMonth: 4, endMonth: 6 },
+        ]
 
   const rateDec = divideDecimals(toDecimal(estimatedTaxRate), toDecimal(100))
 

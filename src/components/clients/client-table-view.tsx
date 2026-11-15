@@ -174,7 +174,7 @@ export function ClientTableView({
                   <th className="px-4 py-3 font-semibold">Platform</th>
                   <th className="px-4 py-3 font-semibold text-right">Lifetime Earnings</th>
                   <th className="px-4 py-3 font-semibold text-center">Payments</th>
-                  <th className="px-4 py-3 font-semibold text-right">Actions</th>
+                  <th className="px-4 py-3 font-semibold text-right whitespace-nowrap min-w-[110px]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -214,18 +214,18 @@ export function ClientTableView({
                         </span>
                       </td>
 
-                      <td className="px-4 py-3.5 text-right font-bold text-foreground">
+                      <td className="px-4 py-3.5 text-right font-bold text-foreground whitespace-nowrap">
                         {formatMoney(client.totalEarningsConverted, baseCurrency)}
                       </td>
 
-                      <td className="px-4 py-3.5 text-center text-muted-foreground">
+                      <td className="px-4 py-3.5 text-center text-muted-foreground whitespace-nowrap">
                         <span className="inline-block rounded-full bg-muted/60 px-2 py-0.5 font-mono text-[11px]">
                           {client.paymentCount}
                         </span>
                       </td>
 
-                      <td className="px-4 py-3.5 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                      <td className="px-4 py-3.5 text-right whitespace-nowrap min-w-[110px]">
+                        <div className="flex items-center justify-end gap-1 shrink-0">
                           <Button
                             variant="ghost"
                             size="icon-xs"

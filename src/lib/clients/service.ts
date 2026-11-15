@@ -1,5 +1,6 @@
 import { createClient, isSupabaseConfigured, getAuthenticatedUser, getUserProfile } from "@/lib/supabase/server"
 import { toDecimal, addDecimals } from "@/lib/currency/format"
+import { normalizeMonetaryAmountToTarget } from "@/lib/currency/normalization"
 
 interface JoinedPlatform {
   id?: string
@@ -93,7 +94,7 @@ export async function getClientsData(): Promise<ClientsPageData> {
         .order("name", { ascending: true }),
       supabase
         .from("transactions")
-        .select("id, client_id, converted_amount, payment_date, status")
+        .select("id, client_id, original_amount, original_currency, converted_amount, converted_currency, exchange_rate, payment_date, status")
         .eq("user_id", user.id),
     ])
 
@@ -120,9 +121,20 @@ export async function getClientsData(): Promise<ClientsPageData> {
         clientStats[tx.client_id] = { total: 0, count: 0, lastDate: null }
       }
       if (tx.status === "completed") {
+        const normalizedAmount = normalizeMonetaryAmountToTarget(
+          {
+            original_amount: tx.original_amount,
+            original_currency: tx.original_currency,
+            converted_amount: tx.converted_amount,
+            converted_currency: tx.converted_currency,
+            exchange_rate: tx.exchange_rate,
+          },
+          baseCurrency
+        )
+
         clientStats[tx.client_id].total = addDecimals(
           toDecimal(clientStats[tx.client_id].total),
-          toDecimal(tx.converted_amount)
+          normalizedAmount
         ).toNumber()
         clientStats[tx.client_id].count += 1
         if (

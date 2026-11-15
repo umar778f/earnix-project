@@ -338,6 +338,154 @@ assert(
   "Notification flyout strictly rejects unsafe or external action URLs"
 )
 
+// -----------------------------------------------------------------------------
+// 8. Production Origin, Multi-Currency Normalization & Tax Engine Regression Tests
+// -----------------------------------------------------------------------------
+console.log("\n[8/8] Running Production Origin, Multi-Currency & Tax Cycle Regression Tests...")
+
+import { resolveCallbackOrigin, isLocalhost, getSafeAppOrigin, PRODUCTION_APP_URL } from "../src/lib/security/origin"
+import { normalizeMonetaryAmountToTarget } from "../src/lib/currency/normalization"
+
+// Test 8.0: isLocalhost, getSafeAppOrigin, and PRODUCTION_APP_URL assertions
+assert(
+  isLocalhost("http://localhost:3000") &&
+    isLocalhost("http://127.0.0.1:8080") &&
+    !isLocalhost("https://earnix-project.vercel.app") &&
+    PRODUCTION_APP_URL === "https://earnix-project.vercel.app" &&
+    typeof getSafeAppOrigin() === "string",
+  "Origin utility functions identify localhost and production domains correctly"
+)
+
+// Test 8.1: Production Callback Origin Guard blocks localhost redirection on production requests
+const originalEnvAppUrl = process.env.NEXT_PUBLIC_APP_URL
+process.env.NEXT_PUBLIC_APP_URL = "http://localhost:3000"
+
+const mockProductionRequest = new Request("https://earnix-project.vercel.app/auth/callback", {
+  headers: {
+    host: "earnix-project.vercel.app",
+    "x-forwarded-proto": "https",
+  },
+})
+
+const resolvedProdOrigin = resolveCallbackOrigin(mockProductionRequest)
+assert(
+  resolvedProdOrigin === "https://earnix-project.vercel.app" &&
+    !resolvedProdOrigin.includes("localhost"),
+  "Callback origin guard strictly prevents localhost redirect on production request even when NEXT_PUBLIC_APP_URL is localhost"
+)
+
+// Test 8.2: Localhost request in development resolves to localhost
+const mockLocalRequest = new Request("http://localhost:3000/auth/callback", {
+  headers: {
+    host: "localhost:3000",
+    "x-forwarded-proto": "http",
+  },
+})
+const resolvedLocalOrigin = resolveCallbackOrigin(mockLocalRequest)
+assert(
+  resolvedLocalOrigin.includes("localhost:3000"),
+  "Callback origin correctly resolves localhost in local development environments"
+)
+
+// Restore env
+process.env.NEXT_PUBLIC_APP_URL = originalEnvAppUrl
+
+// Test 8.3: Tax Engine Calendar-Year Cycle (US / Global)
+const calendarTaxResult = calculateTaxReadyLedger({
+  transactions: [
+    { convertedAmount: 1500, paymentDate: "2025-02-15T10:00:00Z", status: "completed" }, // Feb -> Q1 in calendar
+    { convertedAmount: 2500, paymentDate: "2025-05-10T10:00:00Z", status: "completed" }, // May -> Q2 in calendar
+    { convertedAmount: 3500, paymentDate: "2025-08-20T10:00:00Z", status: "completed" }, // Aug -> Q3 in calendar
+    { convertedAmount: 4500, paymentDate: "2025-11-05T10:00:00Z", status: "completed" }, // Nov -> Q4 in calendar
+  ],
+  expenses: [],
+  estimatedTaxRate: 15.3,
+  taxYearCycle: "calendar",
+  jurisdictionCode: "US",
+})
+
+assert(
+  calendarTaxResult.quarterlyBreakdown[0].periodName === "Q1 (Jan - Mar)" &&
+    calendarTaxResult.quarterlyBreakdown[0].grossIncome === 1500 &&
+    calendarTaxResult.quarterlyBreakdown[1].periodName === "Q2 (Apr - Jun)" &&
+    calendarTaxResult.quarterlyBreakdown[1].grossIncome === 2500 &&
+    calendarTaxResult.quarterlyBreakdown[2].periodName === "Q3 (Jul - Sep)" &&
+    calendarTaxResult.quarterlyBreakdown[2].grossIncome === 3500 &&
+    calendarTaxResult.quarterlyBreakdown[3].periodName === "Q4 (Oct - Dec)" &&
+    calendarTaxResult.quarterlyBreakdown[3].grossIncome === 4500,
+  "Tax engine correctly partitions Calendar-Year cycles: Q1=Jan-Mar, Q2=Apr-Jun, Q3=Jul-Sep, Q4=Oct-Dec"
+)
+
+// Test 8.4: Tax Engine July-June Fiscal Cycle (PK / FBR)
+const fiscalTaxResult = calculateTaxReadyLedger({
+  transactions: [
+    { convertedAmount: 1000, paymentDate: "2024-08-15T10:00:00Z", status: "completed" }, // Aug -> Q1 in fiscal (Jul-Sep)
+    { convertedAmount: 2000, paymentDate: "2024-11-10T10:00:00Z", status: "completed" }, // Nov -> Q2 in fiscal (Oct-Dec)
+    { convertedAmount: 3000, paymentDate: "2025-02-20T10:00:00Z", status: "completed" }, // Feb -> Q3 in fiscal (Jan-Mar)
+    { convertedAmount: 4000, paymentDate: "2025-05-05T10:00:00Z", status: "completed" }, // May -> Q4 in fiscal (Apr-Jun)
+  ],
+  expenses: [],
+  estimatedTaxRate: 1.0,
+  taxYearCycle: "july_june",
+  jurisdictionCode: "PK",
+})
+
+assert(
+  fiscalTaxResult.quarterlyBreakdown[0].periodName === "Q1 (Jul - Sep)" &&
+    fiscalTaxResult.quarterlyBreakdown[0].grossIncome === 1000 &&
+    fiscalTaxResult.quarterlyBreakdown[1].periodName === "Q2 (Oct - Dec)" &&
+    fiscalTaxResult.quarterlyBreakdown[1].grossIncome === 2000 &&
+    fiscalTaxResult.quarterlyBreakdown[2].periodName === "Q3 (Jan - Mar)" &&
+    fiscalTaxResult.quarterlyBreakdown[2].grossIncome === 3000 &&
+    fiscalTaxResult.quarterlyBreakdown[3].periodName === "Q4 (Apr - Jun)" &&
+    fiscalTaxResult.quarterlyBreakdown[3].grossIncome === 4000,
+  "Tax engine preserves July-June Fiscal cycles for PK/FBR jurisdictions"
+)
+
+// Test 8.5: Multi-Currency Normalization (USD + PKR)
+// Scenario: User has Tx1 ($1,000 USD logged when base was USD) and Tx2 (278,500 PKR logged when base was PKR)
+const txUsd = {
+  original_amount: 1000,
+  original_currency: "USD",
+  converted_amount: 1000,
+  converted_currency: "USD",
+  exchange_rate: 1.0,
+}
+
+const txPkr = {
+  original_amount: 278500,
+  original_currency: "PKR",
+  converted_amount: 278500,
+  converted_currency: "PKR",
+  exchange_rate: 1.0,
+}
+
+// When base currency is PKR:
+// txUsd ($1,000) converts to 278,500 PKR. txPkr (278,500 PKR) is identity. Total = 557,000 PKR.
+const amount1InPkr = normalizeMonetaryAmountToTarget(txUsd, "PKR")
+const amount2InPkr = normalizeMonetaryAmountToTarget(txPkr, "PKR")
+const totalInPkr = addDecimals(amount1InPkr, amount2InPkr)
+
+assert(
+  amount1InPkr.equals(new Decimal(278500)) &&
+    amount2InPkr.equals(new Decimal(278500)) &&
+    totalInPkr.equals(new Decimal(557000)),
+  "Multi-currency normalizer converts USD to PKR accurately without cross-currency sum distortion"
+)
+
+// When user changes base currency back to USD:
+// txUsd ($1,000) is identity. txPkr (278,500 PKR) converts to $1,000 USD. Total = $2,000 USD.
+const amount1InUsd = normalizeMonetaryAmountToTarget(txUsd, "USD")
+const amount2InUsd = normalizeMonetaryAmountToTarget(txPkr, "USD")
+const totalInUsd = addDecimals(amount1InUsd, amount2InUsd)
+
+assert(
+  amount1InUsd.equals(new Decimal(1000)) &&
+    amount2InUsd.equals(new Decimal(1000)) &&
+    totalInUsd.equals(new Decimal(2000)),
+  "Multi-currency normalizer converts PKR to USD accurately when user changes base currency"
+)
+
 // Run async categorizer tests and summarize
 runCategorizerTests().then(() => {
   console.log("\n============================================================")

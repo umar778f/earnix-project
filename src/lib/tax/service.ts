@@ -77,6 +77,8 @@ export async function getTaxPreparationSummary(
     })),
     estimatedTaxRate: estimatedRate,
     withholdingTaxSuffered: withholdingSuffered,
+    taxYearCycle: jurisdiction.taxYearCycle,
+    jurisdictionCode: requestedJurisdiction,
   })
 
   return {
