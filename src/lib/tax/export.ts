@@ -1,18 +1,13 @@
 import { type TaxPreparationData } from "@/lib/tax/service"
 import { type TransactionRecordItem } from "@/lib/transactions/service"
 import { type ExpenseItem } from "@/lib/expenses/service"
+import { sanitizeFormulaCell } from "@/lib/security/sanitization"
 
 /**
  * Neutralizes Excel / Google Sheets formula injection (CWE-1236) and escapes double quotes.
  */
 export function sanitizeCsvCell(value: unknown): string {
-  if (value === null || value === undefined) return '""'
-  let str = String(value)
-  // If the cell begins with formula execution characters, prefix with a single quote to force text interpretation
-  if (/^[=\+\-@\t\r]/.test(str)) {
-    str = "'" + str
-  }
-  return `"${str.replace(/"/g, '""')}"`
+  return sanitizeFormulaCell(value)
 }
 
 export function generateTaxReportCsv(params: {

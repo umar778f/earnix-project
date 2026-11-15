@@ -14,7 +14,6 @@ import Decimal from "decimal.js"
 import { toDecimal, addDecimals, multiplyDecimals, divideDecimals } from "../src/lib/currency/format"
 import { BENCHMARK_RATES_TO_USD } from "../src/lib/currency/currencies"
 import { calculateTaxReadyLedger } from "../src/lib/tax/engine"
-import { sanitizeCsvCell } from "../src/lib/tax/export"
 import { parseUpworkCsv, SAMPLE_UPWORK_CSV } from "../src/lib/parsers/upwork"
 import { parseGenericCsv, SAMPLE_GENERIC_CSV } from "../src/lib/parsers/generic"
 import { classifyIncomeTransaction, classifyExpenseRecord } from "../src/lib/ai/categorizer"
@@ -279,7 +278,7 @@ assert(!invalidDoc.success, "Document upload schema rejects disallowed document 
 
 // Test: File name sanitization against path traversal
 const dangerousFileName = "../../../etc/passwd.pdf"
-const sanitized = dangerousFileName.trim().replace(/\.\./g, "_").replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100)
+const sanitized = sanitizeFileName(dangerousFileName)
 assert(
   !sanitized.includes("/") && !sanitized.includes("\\") && !sanitized.includes(".."),
   `File name sanitization neutralizes directory traversal attack: '${dangerousFileName}' -> '${sanitized}'`
@@ -287,27 +286,20 @@ assert(
 
 // Test: CSV Formula Injection Neutralization (CWE-1236)
 const maliciousFormula = "=cmd|' /C calc'!A0"
-const sanitizedFormula = sanitizeCsvCell(maliciousFormula)
+const sanitizedFormula = sanitizeFormulaCell(maliciousFormula)
 assert(
   sanitizedFormula.startsWith("\"'") && sanitizedFormula.includes(maliciousFormula),
   `CSV export neutralizes Excel formula injection (prefixed with single quote): '${maliciousFormula}' -> ${sanitizedFormula}`
 )
 
 const maliciousSum = "@SUM(1+1)"
-const sanitizedSum = sanitizeCsvCell(maliciousSum)
+const sanitizedSum = sanitizeFormulaCell(maliciousSum)
 assert(
   sanitizedSum.startsWith("\"'"),
   `CSV export neutralizes @ formula injection: '${maliciousSum}' -> ${sanitizedSum}`
 )
 
 // Test: OAuth Safe Redirect Path Validation
-function getSafeRedirectUrl(next: string | null, fallback = "/dashboard"): string {
-  if (!next) return fallback
-  if (next.startsWith("/") && !next.startsWith("//") && !next.includes("\\")) {
-    return next
-  }
-  return fallback
-}
 assert(
   getSafeRedirectUrl("//evil.com") === "/dashboard" &&
     getSafeRedirectUrl("https://evil.com") === "/dashboard" &&
@@ -320,6 +312,7 @@ assert(
 // -----------------------------------------------------------------------------
 console.log("\n[7/7] Running Security Rate Limiting & Safe Routing Tests...")
 
+import { sanitizeFileName, sanitizeFormulaCell, getSafeRedirectUrl, isSafeActionUrl } from "../src/lib/security/sanitization"
 import { checkRateLimit } from "../src/lib/security/rate-limit"
 
 // Test: Rate limiter allows requests up to maxRequests
@@ -336,10 +329,6 @@ const blockedRes = checkRateLimit(testKey, { maxRequests: 5, windowMs: 1000 })
 assert(!blockedRes.allowed && blockedRes.remaining === 0, "Rate limiter throttles requests exceeding max limit")
 
 // Test: Notification action URL validation
-function isSafeActionUrl(url?: string): boolean {
-  if (!url) return false
-  return url.startsWith("/") && !url.startsWith("//") && !url.includes("\\")
-}
 assert(
   isSafeActionUrl("/dashboard/tax") &&
     !isSafeActionUrl("javascript:alert(1)") &&

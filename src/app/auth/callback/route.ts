@@ -1,14 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
-
-function getSafeRedirectUrl(next: string | null, fallback = "/dashboard"): string {
-  if (!next) return fallback
-  // Strictly prevent open redirects, protocol-relative URLs (//), and backslash bypasses
-  if (next.startsWith("/") && !next.startsWith("//") && !next.includes("\\")) {
-    return next
-  }
-  return fallback
-}
+import { getSafeRedirectUrl } from "@/lib/security/sanitization"
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)

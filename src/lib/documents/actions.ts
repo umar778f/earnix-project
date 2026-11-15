@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
+import { sanitizeFileName } from "@/lib/security/sanitization"
 import {
   documentUploadSchema,
   ALLOWED_MIME_TYPES,
@@ -48,11 +49,7 @@ export async function uploadDocumentAction(formData: FormData): Promise<Document
     return { success: false, error: "Invalid document upload parameters." }
   }
 
-  const sanitizedFileName = customFileName
-    .trim()
-    .replace(/\.\./g, "_")
-    .replace(/[^a-zA-Z0-9._-]/g, "_")
-    .slice(0, 100)
+  const sanitizedFileName = sanitizeFileName(customFileName)
 
   if (!isSupabaseConfigured()) {
     return {

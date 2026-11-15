@@ -66,10 +66,24 @@ npx supabase db push
 
 ---
 
+## Security skills & invariants
+
+Earnix ships with an integrated [Security Skills Suite](skills/security/README.md) enforcing strict financial and application defense invariants:
+
+- [**Financial precision & invariants**](skills/security/01-financial-precision-and-invariants/SKILL.md) — non-floating point `decimal.js` and `NUMERIC(14,4)`
+- [**Supabase RLS & tenant isolation**](skills/security/02-supabase-rls-and-tenant-isolation/SKILL.md) — strict `user_id = auth.uid()` on all tables and document storage
+- [**CSV parser & injection defense**](skills/security/03-csv-parser-and-injection-defense/SKILL.md) — RFC 4180 parsing, platform fee isolation, and formula injection escaping (CWE-1236)
+- [**Input validation & path sanitization**](skills/security/04-input-validation-and-path-sanitization/SKILL.md) — Zod schemas, directory traversal defense (CWE-22), and open redirect defense (CWE-601)
+- [**API protection & rate limiting**](skills/security/05-api-protection-and-rate-limiting/SKILL.md) — sliding-window rate limiting, CSP, HSTS, and X-Frame-Options
+- [**Grounded AI & prompt defense**](skills/security/06-grounded-ai-and-prompt-defense/SKILL.md) — SQL-grounded Copilot queries, length boundaries, and human-in-the-loop review
+- [**Accidental data loss prevention**](skills/security/07-accidental-data-loss-prevention/SKILL.md) — immutable ledger records, environment separation, and destructive SQL safeguards
+
+---
+
 ## Testing
 
 ```bash
-npm test        # 35-point suite: money precision, currency, tax engine, CSV, RLS
+npm test        # 38-point suite: money precision, currency, tax engine, CSV, RLS, and security
 npm run lint
 npm run build
 ```
