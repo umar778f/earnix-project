@@ -132,18 +132,15 @@ export function CopilotChat() {
 
   return (
     <div className="flex flex-col h-[75vh] max-h-[800px] rounded-xl border border-border bg-card shadow-xs overflow-hidden">
-      {/* Zero Hallucination Trust Header */}
+      {/* Copilot Header */}
       <div className="border-b border-border bg-muted/30 px-4 py-2.5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="flex size-6 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
             <ShieldCheck className="size-3.5" />
           </div>
           <span className="text-xs font-semibold text-foreground">
-            Zero-Hallucination Financial Copilot
+            AI Copilot
           </span>
-          <Badge variant="outline" className="text-[10px] text-muted-foreground hidden sm:inline-flex">
-            PostgreSQL &bull; Decimal.js Grounded
-          </Badge>
         </div>
 
         <Button
