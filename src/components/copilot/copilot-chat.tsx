@@ -5,6 +5,7 @@ import { useTransition } from "react"
 import Link from "next/link"
 import { askCopilotAction } from "@/lib/ai/copilot-action"
 import { type CopilotAnswer } from "@/lib/ai/rag"
+import { DEFAULT_COPILOT_QUESTIONS, getFollowUpQuestions } from "@/lib/ai/copilot-guard"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -18,6 +19,8 @@ import {
   DollarSign,
   Receipt,
   HelpCircle,
+  AlertTriangle,
+  MessageSquarePlus,
 } from "lucide-react"
 
 interface ChatMessage {
@@ -25,15 +28,9 @@ interface ChatMessage {
   sender: "user" | "copilot"
   text: string
   answerData?: CopilotAnswer
+  suggestedQuestions?: string[]
   timestamp: string
 }
-
-const SUGGESTED_PROMPTS = [
-  "What was my total gross income from Upwork?",
-  "What are my total business expenses and deductible costs?",
-  "What is my estimated taxable net income and recommended tax reserve?",
-  "Which client generated the highest revenue this year?",
-]
 
 export function CopilotChat() {
   const baseId = React.useId()
@@ -44,6 +41,7 @@ export function CopilotChat() {
       id: "welcome-msg",
       sender: "copilot",
       text: "Ask questions about your freelance earnings, client milestones, currency conversions, or business expenses.",
+      suggestedQuestions: [...DEFAULT_COPILOT_QUESTIONS],
       timestamp: "Just now",
     },
   ])
@@ -82,6 +80,11 @@ export function CopilotChat() {
       const copilotMsgId = `${baseId}-copilot-${msgIndexRef.current}`
 
       if (result.success && result.data) {
+        const nextChoices =
+          result.data.suggestedQuestions && result.data.suggestedQuestions.length === 4
+            ? result.data.suggestedQuestions
+            : getFollowUpQuestions(query, result.data.isIrrelevant ? "irrelevant" : "general")
+
         const copilotMessage: ChatMessage = {
           id: copilotMsgId,
           sender: "copilot",
@@ -89,7 +92,9 @@ export function CopilotChat() {
           answerData: {
             ...result.data,
             answer: (result.data.answer || "").replace(/\*\*/g, ""),
+            suggestedQuestions: nextChoices,
           },
+          suggestedQuestions: nextChoices,
           timestamp: "Just now",
         }
         setMessages((prev) => [...prev, copilotMessage])
@@ -98,6 +103,7 @@ export function CopilotChat() {
           id: copilotMsgId,
           sender: "copilot",
           text: (result.error || "I could not retrieve the financial answer at this time. Please try again.").replace(/\*\*/g, ""),
+          suggestedQuestions: getFollowUpQuestions(query),
           timestamp: "Just now",
         }
         setMessages((prev) => [...prev, errorMsg])
@@ -118,6 +124,7 @@ export function CopilotChat() {
         id: "welcome-msg",
         sender: "copilot",
         text: "Chat cleared. Ask me any question grounded in your verified freelance financial records.",
+        suggestedQuestions: [...DEFAULT_COPILOT_QUESTIONS],
         timestamp: "Just now",
       },
     ])
@@ -167,12 +174,30 @@ export function CopilotChat() {
               </div>
             ) : (
               // Copilot response card
-              <div className="max-w-[95%] sm:max-w-2xl rounded-xl border border-border bg-muted/20 p-4 space-y-3 text-xs shadow-xs">
+              <div
+                className={`max-w-[95%] sm:max-w-2xl rounded-xl border p-4 space-y-3 text-xs shadow-xs ${
+                  msg.answerData?.isIrrelevant
+                    ? "border-amber-500/40 bg-amber-500/5"
+                    : "border-border bg-muted/20"
+                }`}
+              >
                 {/* Header with Model Badge */}
-                <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                <div className="flex items-center justify-between gap-2 border-b border-border/50 pb-2">
                   <div className="flex items-center gap-2 text-primary font-semibold">
-                    <Sparkles className="size-3.5" />
+                    {msg.answerData?.isIrrelevant ? (
+                      <AlertTriangle className="size-3.5 text-amber-500" />
+                    ) : (
+                      <Sparkles className="size-3.5" />
+                    )}
                     <span>Earnix Copilot</span>
+                    {msg.answerData?.isIrrelevant && (
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] px-1.5 py-0 h-4 border-amber-500/40 text-amber-600 dark:text-amber-400"
+                      >
+                        Irrelevant Question
+                      </Badge>
+                    )}
                   </div>
                   {msg.answerData?.deterministicModel && (
                     <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 text-muted-foreground font-mono">
@@ -237,6 +262,29 @@ export function CopilotChat() {
                     </div>
                   </div>
                 )}
+
+                {/* 4 Suggested Follow-Up Question Choices (Shown after every response) */}
+                {msg.suggestedQuestions && msg.suggestedQuestions.length > 0 && (
+                  <div className="space-y-1.5 pt-2 border-t border-border/50">
+                    <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                      <MessageSquarePlus className="size-2.5" />
+                      <span>Suggested Questions:</span>
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      {msg.suggestedQuestions.slice(0, 4).map((prompt, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => handleSend(prompt)}
+                          disabled={isPending}
+                          className="text-[11px] rounded-md border border-border bg-background px-2.5 py-1.5 text-foreground hover:border-primary/40 hover:bg-muted/40 transition-colors text-left cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          &ldquo;{prompt}&rdquo;
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -254,28 +302,6 @@ export function CopilotChat() {
 
         <div ref={messagesEndRef} />
       </div>
-
-      {/* Suggested Prompts Strip (Visible on start) */}
-      {messages.length <= 2 && (
-        <div className="px-4 py-2 border-t border-border/60 bg-muted/10 space-y-1.5">
-          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-            Suggested Inquiries:
-          </span>
-          <div className="flex flex-wrap gap-1.5">
-            {SUGGESTED_PROMPTS.map((prompt, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => handleSend(prompt)}
-                disabled={isPending}
-                className="text-[11px] rounded-md border border-border bg-background px-2.5 py-1 text-foreground hover:border-primary/40 hover:bg-muted/30 transition-colors text-left cursor-pointer"
-              >
-                &ldquo;{prompt}&rdquo;
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Input Box Footer */}
       <div className="border-t border-border bg-background p-3">

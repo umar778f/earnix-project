@@ -2,6 +2,13 @@ import { getGeminiClient, isGeminiConfigured } from "@/lib/ai/gemini-client"
 import { getTransactionsData, type TransactionRecordItem } from "@/lib/transactions/service"
 import { getExpensesSummary, type ExpenseItem } from "@/lib/expenses/service"
 import { formatMoney, toDecimal, addDecimals, subtractDecimals } from "@/lib/currency/format"
+import {
+  isRelevantCopilotQuery,
+  getFollowUpQuestions,
+  IRRELEVANT_QUERY_RESPONSE,
+  IRRELEVANT_SENTINEL,
+  type CopilotTopic,
+} from "@/lib/ai/copilot-guard"
 import Decimal from "decimal.js"
 
 export interface CopilotCitation {
@@ -25,6 +32,8 @@ export interface CopilotAnswer {
   answer: string
   groundedMetrics: CopilotGroundedMetric[]
   citations: CopilotCitation[]
+  suggestedQuestions: string[]
+  isIrrelevant?: boolean
   deterministicModel: string
   timestamp: string
 }
@@ -43,6 +52,27 @@ export async function queryEarnixCopilot(userQuery: string): Promise<CopilotAnsw
     getTransactionsData(),
     getExpensesSummary(),
   ])
+
+  // 1b. Scope Guard: reject irrelevant or off-topic questions immediately
+  const isRelevant = isRelevantCopilotQuery(userQuery, {
+    clientNames: transactionsData.clients.map((c) => c.name),
+    platformNames: transactionsData.transactions.map((t) => t.platformName),
+    expenseTitles: expensesData.expenses.map((e) => e.title),
+    expenseCategories: expensesData.expenses.map((e) => e.category),
+  })
+
+  if (!isRelevant) {
+    return {
+      query: userQuery,
+      answer: IRRELEVANT_QUERY_RESPONSE,
+      groundedMetrics: [],
+      citations: [],
+      suggestedQuestions: getFollowUpQuestions(userQuery, "irrelevant"),
+      isIrrelevant: true,
+      deterministicModel: "Earnix Scope Guard (Zero-Hallucination)",
+      timestamp: new Date().toISOString(),
+    }
+  }
 
   const baseCurrency = transactionsData.baseCurrency || "USD"
 
@@ -257,6 +287,15 @@ VERIFIED FINANCIAL LEDGER SUMMARY (Computed strictly by PostgreSQL & Decimal ari
   }
 `
 
+  const topic: CopilotTopic = isTaxSpecific
+    ? "tax"
+    : isExpenseSpecific
+      ? "expenses"
+      : isUpworkSpecific || isClientSpecific
+        ? "income"
+        : "general"
+  const suggestedQuestions = getFollowUpQuestions(userQuery, topic)
+
   // 4. Generate Answer via Gemini 2.5 Flash
   const gemini = getGeminiClient()
 
@@ -276,6 +315,7 @@ CRITICAL GROUNDING & SECURITY RULES:
 4. Be professional, concise, encouraging, and clear. Format numbers with their currency symbol.
 5. Keep the response within 2-3 concise paragraphs.
 6. DO NOT use markdown bold asterisks (**) or double stars anywhere in your answer. Output clean plain text without any asterisks.
+7. SCOPE GUARD: If the user's question is unrelated to their freelance accounting, income, expenses, clients, platforms, currency conversions, tax estimates, or Earnix ledger (such as trivia, jokes, weather, sports, recipes, general coding, or off-topic chat), reply ONLY with the exact token: ${IRRELEVANT_SENTINEL}
 
 ${verifiedContext}`
 
@@ -285,11 +325,27 @@ ${verifiedContext}`
       })
 
       if (response.text) {
+        const cleanedText = response.text.trim().replace(/\*\*/g, "")
+        if (cleanedText.includes(IRRELEVANT_SENTINEL)) {
+          return {
+            query: userQuery,
+            answer: IRRELEVANT_QUERY_RESPONSE,
+            groundedMetrics: [],
+            citations: [],
+            suggestedQuestions: getFollowUpQuestions(userQuery, "irrelevant"),
+            isIrrelevant: true,
+            deterministicModel: "Earnix Scope Guard (Zero-Hallucination)",
+            timestamp: new Date().toISOString(),
+          }
+        }
+
         return {
           query: userQuery,
-          answer: response.text.trim().replace(/\*\*/g, ""),
+          answer: cleanedText,
           groundedMetrics,
           citations,
+          suggestedQuestions,
+          isIrrelevant: false,
           deterministicModel: "gemini-2.0-flash (Grounded in Verified Ledger)",
           timestamp: new Date().toISOString(),
         }
@@ -386,6 +442,8 @@ Your recommended 1.00% tax reserve is currently ${formatMoney(
     answer: fallbackAnswer,
     groundedMetrics,
     citations,
+    suggestedQuestions,
+    isIrrelevant: false,
     deterministicModel: "deterministic_ledger_engine (Zero-Hallucination)",
     timestamp: new Date().toISOString(),
   }

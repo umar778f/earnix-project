@@ -1,6 +1,11 @@
 "use server"
 
 import { queryEarnixCopilot, type CopilotAnswer } from "@/lib/ai/rag"
+import {
+  DEFAULT_COPILOT_QUESTIONS,
+  IRRELEVANT_QUERY_RESPONSE,
+  isRelevantCopilotQuery,
+} from "@/lib/ai/copilot-guard"
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 
 export type CopilotActionResult = {
@@ -52,6 +57,22 @@ export async function askCopilotAction(query: string): Promise<CopilotActionResu
     queryLower.includes("how does it work")
 
   if (!isAuthenticated && !isGeneralOrTaxQuery) {
+    if (!isRelevantCopilotQuery(trimmed)) {
+      return {
+        success: true,
+        data: {
+          query: trimmed,
+          answer: IRRELEVANT_QUERY_RESPONSE,
+          groundedMetrics: [],
+          citations: [],
+          suggestedQuestions: [...DEFAULT_COPILOT_QUESTIONS],
+          isIrrelevant: true,
+          deterministicModel: "Earnix Scope Guard (Zero-Hallucination)",
+          timestamp: new Date().toISOString(),
+        },
+      }
+    }
+
     return {
       success: true,
       data: {
@@ -63,6 +84,8 @@ export async function askCopilotAction(query: string): Promise<CopilotActionResu
           { label: "Ledger Security", value: "PostgreSQL RLS Active" },
         ],
         citations: [],
+        suggestedQuestions: [...DEFAULT_COPILOT_QUESTIONS],
+        isIrrelevant: false,
         deterministicModel: "Earnix Grounded Security Engine",
         timestamp: new Date().toISOString(),
       },
