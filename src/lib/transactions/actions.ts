@@ -1,10 +1,15 @@
 "use server"
 
+import { randomUUID } from "crypto"
 import { revalidatePath } from "next/cache"
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { transactionSchema } from "@/lib/transactions/schemas"
 import { toDecimal, multiplyDecimals } from "@/lib/currency/format"
 import { getExchangeRate } from "@/lib/currency/exchange"
+
+function generateManualReferenceId(): string {
+  return `MAN-${randomUUID().replace(/-/g, "").slice(0, 10).toUpperCase()}`
+}
 
 export type TransactionActionResult = {
   success: boolean
@@ -117,12 +122,13 @@ export async function createTransactionAction(
 
   const exchangeRateDec = toDecimal(exchangeRateNum)
   const convertedAmountDec = multiplyDecimals(originalAmountDec, exchangeRateDec)
+  const resolvedReferenceId = parsed.data.referenceId?.trim() || generateManualReferenceId()
 
   const { error } = await supabase.from("transactions").insert({
     user_id: user.id,
     client_id: parsed.data.clientId || null,
     platform_id: resolvedPlatformId,
-    reference_id: parsed.data.referenceId || null,
+    reference_id: resolvedReferenceId,
     original_amount: originalAmountDec.toNumber(),
     original_currency: parsed.data.originalCurrency,
     exchange_rate: exchangeRateDec.toNumber(),
@@ -228,13 +234,14 @@ export async function updateTransactionAction(
 
   const exchangeRateDec = toDecimal(exchangeRateNum)
   const convertedAmountDec = multiplyDecimals(originalAmountDec, exchangeRateDec)
+  const resolvedReferenceId = parsed.data.referenceId?.trim() || generateManualReferenceId()
 
   const { error } = await supabase
     .from("transactions")
     .update({
       client_id: parsed.data.clientId || null,
       platform_id: resolvedPlatformId,
-      reference_id: parsed.data.referenceId || null,
+      reference_id: resolvedReferenceId,
       original_amount: originalAmountDec.toNumber(),
       original_currency: parsed.data.originalCurrency,
       exchange_rate: exchangeRateDec.toNumber(),
@@ -250,6 +257,12 @@ export async function updateTransactionAction(
     .eq("user_id", user.id)
 
   if (error) {
+    if (error.code === "23505") {
+      return {
+        success: false,
+        error: `Duplicate transaction detected: A transaction with Reference ID "${resolvedReferenceId}" already exists for this platform.`,
+      }
+    }
     return {
       success: false,
       error: error.message,
