@@ -7,7 +7,7 @@ import { InteractiveDashboardDemo } from "@/components/landing/interactive-dashb
 import { FaqSection } from "@/components/landing/faq-section"
 import {
   Sparkles,
-  LayoutDashboard,
+  LogIn,
   ArrowRight,
   Coins,
   FileSpreadsheet,
@@ -117,14 +117,14 @@ export default function HomePage() {
                   <ArrowRight className="size-4" />
                 </Link>
                 <Link
-                  href="/dashboard"
+                  href="/login"
                   className={cn(
                     buttonVariants({ variant: "outline", size: "lg" }),
                     "font-semibold text-base px-7 py-6 border-border hover:bg-muted text-foreground gap-2 cursor-pointer text-center justify-center"
                   )}
                 >
-                  <LayoutDashboard className="size-4 text-muted-foreground" />
-                  <span>Go to Dashboard</span>
+                  <LogIn className="size-4 text-muted-foreground" />
+                  <span>Log in</span>
                 </Link>
               </div>
 

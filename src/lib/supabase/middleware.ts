@@ -24,8 +24,13 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse
   }
 
+  // Always allow /login to render directly so clicking "Log in" shows the
+  // sign-in form first even if a previous session cookie exists.
+  if (pathname.startsWith("/login")) {
+    return supabaseResponse
+  }
+
   const isAuthRoute =
-    pathname.startsWith("/login") ||
     pathname.startsWith("/signup") ||
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/reset-password")
