@@ -7,9 +7,9 @@ import { getTransactionsData } from "@/lib/transactions/service"
 import { getExpensesSummary } from "@/lib/expenses/service"
 
 export const metadata: Metadata = {
-  title: "Tax Preparation Center | Earnix",
+  title: "Tax Center | Earnix",
   description:
-    "Organize tax-ready financial records, compute configurable liabilities, and export comprehensive accountant audit packs.",
+    "Configure your tax rate, review estimated tax reserves, and export your tax summary.",
 }
 
 export default async function TaxPage() {
@@ -22,8 +22,8 @@ export default async function TaxPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="Tax Preparation Center"
-        description="Organize tax-ready financial records, configure estimation rates, and export substantiated audit packages for your accountant."
+        title="Tax Center"
+        description="Configure your tax rate, review estimated tax reserves, and export your tax summary."
       />
 
       <TaxCenterView
