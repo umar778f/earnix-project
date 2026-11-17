@@ -135,100 +135,116 @@ export default function HomePage() {
             </div>
 
             {/* Right Column: Financial Snapshot Card */}
-            <div className="lg:col-span-6">
-              <InteractiveTiltCard className="space-y-4 border-border bg-card shadow-md">
-                {/* Header bar */}
-                <div className="flex items-center justify-between pb-3 border-b border-border/60">
-                  <div>
-                    <h3 className="text-sm font-semibold text-foreground">
-                      Financial snapshot
-                    </h3>
-                    <p className="text-xs text-muted-foreground">Dual-currency ledger</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1.5 text-xs font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20">
-                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    278.90 PKR / USD
-                  </span>
-                </div>
+            <div className="lg:col-span-6 relative pt-4 sm:pt-5">
+              {/* Subtle Ambient Emerald Glow */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -inset-3 rounded-3xl bg-emerald-500/10 blur-2xl opacity-70 animate-pulse"
+              />
 
-                {/* 3 Metric Cards */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-1">
-                    <p className="text-[11px] text-muted-foreground font-medium">Gross income</p>
-                    <p className="text-base sm:text-lg font-bold text-foreground font-mono tabular-nums">
-                      $12,450.00
-                    </p>
-                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono tabular-nums font-semibold">
-                      ₨3,472,305
-                    </p>
-                  </div>
+              {/* Floating Top-Right Verification Pill */}
+              <div className="absolute -top-1 right-4 z-20 animate-badge-float">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-card/95 backdrop-blur-md px-3 py-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 shadow-md">
+                  <ShieldCheck className="size-3.5" />
+                  <span>Tax-Ready &amp; Verified</span>
+                </span>
+              </div>
 
-                  <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-1">
-                    <p className="text-[11px] text-muted-foreground font-medium">Deductions</p>
-                    <p className="text-base sm:text-lg font-bold text-foreground font-mono tabular-nums">
-                      $1,280.00
-                    </p>
-                    <p className="text-[11px] text-muted-foreground font-mono tabular-nums">
-                      ₨357,000
-                    </p>
-                  </div>
-
-                  <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-1">
-                    <p className="text-[11px] text-muted-foreground font-medium">1% Tax reserve</p>
-                    <p className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">
-                      $124.50
-                    </p>
-                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono tabular-nums font-semibold">
-                      ₨34,723
-                    </p>
-                  </div>
-                </div>
-
-                {/* Mini Income Velocity Sparkline */}
-                <div className="rounded-lg border border-border/70 bg-muted/20 p-3 space-y-2">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="font-semibold text-foreground flex items-center gap-1.5">
-                      <TrendingUp className="size-3.5 text-emerald-500" />
-                      6-month income velocity
+              <div className="relative z-10 animate-hero-float">
+                <InteractiveTiltCard className="space-y-4 border-border bg-card shadow-lg">
+                  {/* Header bar */}
+                  <div className="flex items-center justify-between pb-3 border-b border-border/60">
+                    <div>
+                      <h3 className="text-sm font-semibold text-foreground">
+                        Financial snapshot
+                      </h3>
+                      <p className="text-xs text-muted-foreground">Dual-currency ledger</p>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20">
+                      <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      278.90 PKR / USD
                     </span>
-                    <span className="text-muted-foreground font-mono text-[11px] font-medium">+18.4% vs last period</span>
-                  </div>
-                  {/* Visual SVG Sparkline */}
-                  <div className="h-10 w-full flex items-end gap-1.5 pt-1">
-                    <div className="w-1/6 bg-emerald-500/30 rounded-t h-[40%]" />
-                    <div className="w-1/6 bg-emerald-500/40 rounded-t h-[55%]" />
-                    <div className="w-1/6 bg-emerald-500/50 rounded-t h-[50%]" />
-                    <div className="w-1/6 bg-emerald-500/60 rounded-t h-[75%]" />
-                    <div className="w-1/6 bg-emerald-500/80 rounded-t h-[85%]" />
-                    <div className="w-1/6 bg-emerald-500 rounded-t h-[100%]" />
-                  </div>
-                </div>
-
-                {/* Recent Verified Records */}
-                <div className="space-y-1.5 text-xs pt-1">
-                  <div className="flex items-center justify-between p-2.5 rounded-lg border border-border/60 bg-muted/30">
-                    <div>
-                      <p className="font-semibold text-foreground">Upwork milestone (Contract 4921)</p>
-                      <p className="text-[11px] text-muted-foreground">Software engineering &bull; Auto-imported</p>
-                    </div>
-                    <div className="text-right font-mono tabular-nums">
-                      <p className="font-bold text-emerald-600 dark:text-emerald-400">+$2,500.00</p>
-                      <p className="text-[10px] text-muted-foreground">₨697,250</p>
-                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 rounded-lg border border-border/60 bg-muted/30">
-                    <div>
-                      <p className="font-semibold text-foreground">AWS cloud servers &amp; tooling</p>
-                      <p className="text-[11px] text-muted-foreground">Operational deduction &bull; Receipt verified</p>
+                  {/* 3 Metric Cards */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-1 transition-colors duration-200 hover:border-emerald-500/40">
+                      <p className="text-[11px] text-muted-foreground font-medium">Gross income</p>
+                      <p className="text-base sm:text-lg font-bold text-foreground font-mono tabular-nums">
+                        $12,450.00
+                      </p>
+                      <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono tabular-nums font-semibold">
+                        ₨3,472,305
+                      </p>
                     </div>
-                    <div className="text-right font-mono tabular-nums">
-                      <p className="font-semibold text-foreground">-$84.20</p>
-                      <p className="text-[10px] text-emerald-600 dark:text-emerald-400">₨23,480</p>
+
+                    <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-1 transition-colors duration-200 hover:border-emerald-500/40">
+                      <p className="text-[11px] text-muted-foreground font-medium">Deductions</p>
+                      <p className="text-base sm:text-lg font-bold text-foreground font-mono tabular-nums">
+                        $1,280.00
+                      </p>
+                      <p className="text-[11px] text-muted-foreground font-mono tabular-nums">
+                        ₨357,000
+                      </p>
+                    </div>
+
+                    <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-1 transition-colors duration-200 hover:border-emerald-500/40">
+                      <p className="text-[11px] text-muted-foreground font-medium">1% Tax reserve</p>
+                      <p className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">
+                        $124.50
+                      </p>
+                      <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono tabular-nums font-semibold">
+                        ₨34,723
+                      </p>
                     </div>
                   </div>
-                </div>
-              </InteractiveTiltCard>
+
+                  {/* Mini Income Velocity Sparkline */}
+                  <div className="rounded-lg border border-border/70 bg-muted/20 p-3 space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-semibold text-foreground flex items-center gap-1.5">
+                        <TrendingUp className="size-3.5 text-emerald-500" />
+                        6-month income velocity
+                      </span>
+                      <span className="text-muted-foreground font-mono text-[11px] font-medium">+18.4% vs last period</span>
+                    </div>
+                    {/* Animated Sparkline Bars */}
+                    <div className="h-10 w-full flex items-end gap-1.5 pt-1 overflow-hidden">
+                      <div className="w-1/6 bg-emerald-500/30 rounded-t h-[40%] animate-bar-wave [animation-delay:0ms]" />
+                      <div className="w-1/6 bg-emerald-500/40 rounded-t h-[55%] animate-bar-wave [animation-delay:220ms]" />
+                      <div className="w-1/6 bg-emerald-500/50 rounded-t h-[50%] animate-bar-wave [animation-delay:440ms]" />
+                      <div className="w-1/6 bg-emerald-500/60 rounded-t h-[75%] animate-bar-wave [animation-delay:660ms]" />
+                      <div className="w-1/6 bg-emerald-500/80 rounded-t h-[85%] animate-bar-wave [animation-delay:880ms]" />
+                      <div className="w-1/6 bg-emerald-500 rounded-t h-[92%] animate-bar-wave [animation-delay:1100ms]" />
+                    </div>
+                  </div>
+
+                  {/* Recent Verified Records */}
+                  <div className="space-y-1.5 text-xs pt-1">
+                    <div className="flex items-center justify-between p-2.5 rounded-lg border border-border/60 bg-muted/30 transition-colors duration-200 hover:border-emerald-500/40">
+                      <div>
+                        <p className="font-semibold text-foreground">Upwork milestone (Contract 4921)</p>
+                        <p className="text-[11px] text-muted-foreground">Software engineering &bull; Auto-imported</p>
+                      </div>
+                      <div className="text-right font-mono tabular-nums">
+                        <p className="font-bold text-emerald-600 dark:text-emerald-400">+$2,500.00</p>
+                        <p className="text-[10px] text-muted-foreground">₨697,250</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-2.5 rounded-lg border border-border/60 bg-muted/30 transition-colors duration-200 hover:border-emerald-500/40">
+                      <div>
+                        <p className="font-semibold text-foreground">AWS cloud servers &amp; tooling</p>
+                        <p className="text-[11px] text-muted-foreground">Operational deduction &bull; Receipt verified</p>
+                      </div>
+                      <div className="text-right font-mono tabular-nums">
+                        <p className="font-semibold text-foreground">-$84.20</p>
+                        <p className="text-[10px] text-emerald-600 dark:text-emerald-400">₨23,480</p>
+                      </div>
+                    </div>
+                  </div>
+                </InteractiveTiltCard>
+              </div>
             </div>
           </div>
         </div>
