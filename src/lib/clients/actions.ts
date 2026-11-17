@@ -49,12 +49,24 @@ export async function createClientAction(
     }
   }
 
+  let resolvedPlatformId: string | null = parsed.data.defaultPlatformId || null
+  if (resolvedPlatformId) {
+    const { data: platformRow } = await supabase
+      .from("platforms")
+      .select("id")
+      .eq("id", resolvedPlatformId)
+      .maybeSingle()
+    if (!platformRow) {
+      resolvedPlatformId = null
+    }
+  }
+
   const { error } = await supabase.from("clients").insert({
     user_id: user.id,
     name: parsed.data.name,
     email: parsed.data.email || null,
     country: parsed.data.country || null,
-    default_platform_id: parsed.data.defaultPlatformId || null,
+    default_platform_id: resolvedPlatformId,
     notes: parsed.data.notes || null,
   })
 
@@ -72,6 +84,7 @@ export async function createClientAction(
   }
 
   revalidatePath("/clients")
+  revalidatePath("/transactions")
   revalidatePath("/dashboard")
   return {
     success: true,
@@ -119,13 +132,25 @@ export async function updateClientAction(
     }
   }
 
+  let resolvedPlatformId: string | null = parsed.data.defaultPlatformId || null
+  if (resolvedPlatformId) {
+    const { data: platformRow } = await supabase
+      .from("platforms")
+      .select("id")
+      .eq("id", resolvedPlatformId)
+      .maybeSingle()
+    if (!platformRow) {
+      resolvedPlatformId = null
+    }
+  }
+
   const { error } = await supabase
     .from("clients")
     .update({
       name: parsed.data.name,
       email: parsed.data.email || null,
       country: parsed.data.country || null,
-      default_platform_id: parsed.data.defaultPlatformId || null,
+      default_platform_id: resolvedPlatformId,
       notes: parsed.data.notes || null,
     })
     .eq("id", clientId)
@@ -139,6 +164,7 @@ export async function updateClientAction(
   }
 
   revalidatePath("/clients")
+  revalidatePath("/transactions")
   revalidatePath("/dashboard")
   return {
     success: true,

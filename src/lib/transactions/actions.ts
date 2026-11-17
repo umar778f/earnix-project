@@ -4,11 +4,44 @@ import { revalidatePath } from "next/cache"
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { transactionSchema } from "@/lib/transactions/schemas"
 import { toDecimal, multiplyDecimals } from "@/lib/currency/format"
+import { getExchangeRate } from "@/lib/currency/exchange"
 
 export type TransactionActionResult = {
   success: boolean
   error?: string
   message?: string
+}
+
+async function resolveValidPlatformId(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  requestedPlatformId?: string | null
+): Promise<string | null> {
+  if (requestedPlatformId) {
+    const { data: exact } = await supabase
+      .from("platforms")
+      .select("id")
+      .eq("id", requestedPlatformId)
+      .maybeSingle()
+    if (exact?.id) {
+      return exact.id
+    }
+  }
+
+  const { data: platforms } = await supabase
+    .from("platforms")
+    .select("id, code")
+    .eq("is_active", true)
+
+  if (!platforms || platforms.length === 0) {
+    return null
+  }
+
+  const preferred =
+    platforms.find((p) => p.code === "manual") ||
+    platforms.find((p) => p.code === "upwork") ||
+    platforms[0]
+
+  return preferred.id
 }
 
 export async function createTransactionAction(
@@ -22,14 +55,16 @@ export async function createTransactionAction(
     }
   }
 
+  const today = new Date().toISOString().split("T")[0]
+  const rawExchangeRate = formData.get("exchangeRate")
   const rawData = {
     clientId: formData.get("clientId") || "",
-    platformId: formData.get("platformId"),
-    originalAmount: formData.get("originalAmount"),
-    originalCurrency: formData.get("originalCurrency"),
-    exchangeRate: formData.get("exchangeRate") || "1.0",
-    paymentDate: formData.get("paymentDate"),
-    description: formData.get("description"),
+    platformId: formData.get("platformId") || "",
+    originalAmount: formData.get("originalAmount") || "",
+    originalCurrency: formData.get("originalCurrency") || "USD",
+    exchangeRate: typeof rawExchangeRate === "string" && rawExchangeRate.trim() !== "" ? rawExchangeRate.trim() : undefined,
+    paymentDate: formData.get("paymentDate") || today,
+    description: formData.get("description") || "",
     referenceId: formData.get("referenceId") || "",
     status: formData.get("status") || "completed",
     category: formData.get("category") || "Freelance Income",
@@ -55,32 +90,46 @@ export async function createTransactionAction(
     }
   }
 
-  // Determine user base currency
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("default_currency")
-    .eq("id", user.id)
-    .single()
+  const [profileResult, resolvedPlatformId] = await Promise.all([
+    supabase.from("profiles").select("default_currency").eq("id", user.id).single(),
+    resolveValidPlatformId(supabase, parsed.data.platformId),
+  ])
 
-  const baseCurrency = profile?.default_currency || "USD"
+  if (!resolvedPlatformId) {
+    return {
+      success: false,
+      error: "No active platform found in database. Please run the database seed migration.",
+    }
+  }
+
+  const baseCurrency = profileResult.data?.default_currency || "USD"
   const originalAmountDec = toDecimal(parsed.data.originalAmount)
-  const exchangeRateDec = toDecimal(parsed.data.exchangeRate || 1.0)
 
-  // Use arbitrary-precision decimal multiplication for financial ledger
+  let exchangeRateNum: number
+  let conversionSource = "manual_entry"
+  if (parsed.data.exchangeRate) {
+    exchangeRateNum = toDecimal(parsed.data.exchangeRate).toNumber()
+  } else {
+    const rateResult = await getExchangeRate(parsed.data.originalCurrency, baseCurrency)
+    exchangeRateNum = rateResult.rate
+    conversionSource = rateResult.source
+  }
+
+  const exchangeRateDec = toDecimal(exchangeRateNum)
   const convertedAmountDec = multiplyDecimals(originalAmountDec, exchangeRateDec)
 
   const { error } = await supabase.from("transactions").insert({
     user_id: user.id,
     client_id: parsed.data.clientId || null,
-    platform_id: parsed.data.platformId,
+    platform_id: resolvedPlatformId,
     reference_id: parsed.data.referenceId || null,
     original_amount: originalAmountDec.toNumber(),
     original_currency: parsed.data.originalCurrency,
     exchange_rate: exchangeRateDec.toNumber(),
     converted_amount: convertedAmountDec.toNumber(),
     converted_currency: baseCurrency,
-    conversion_date: new Date().toISOString().split("T")[0],
-    conversion_source: "manual_entry",
+    conversion_date: today,
+    conversion_source: conversionSource,
     payment_date: new Date(parsed.data.paymentDate).toISOString(),
     description: parsed.data.description,
     status: parsed.data.status,
@@ -105,9 +154,10 @@ export async function createTransactionAction(
   revalidatePath("/transactions")
   revalidatePath("/dashboard")
   revalidatePath("/clients")
+  revalidatePath("/tax")
   return {
     success: true,
-    message: "Transaction logged successfully in ledger.",
+    message: "Transaction saved.",
   }
 }
 
@@ -123,14 +173,16 @@ export async function updateTransactionAction(
     }
   }
 
+  const today = new Date().toISOString().split("T")[0]
+  const rawExchangeRate = formData.get("exchangeRate")
   const rawData = {
     clientId: formData.get("clientId") || "",
-    platformId: formData.get("platformId"),
-    originalAmount: formData.get("originalAmount"),
-    originalCurrency: formData.get("originalCurrency"),
-    exchangeRate: formData.get("exchangeRate") || "1.0",
-    paymentDate: formData.get("paymentDate"),
-    description: formData.get("description"),
+    platformId: formData.get("platformId") || "",
+    originalAmount: formData.get("originalAmount") || "",
+    originalCurrency: formData.get("originalCurrency") || "USD",
+    exchangeRate: typeof rawExchangeRate === "string" && rawExchangeRate.trim() !== "" ? rawExchangeRate.trim() : undefined,
+    paymentDate: formData.get("paymentDate") || today,
+    description: formData.get("description") || "",
     referenceId: formData.get("referenceId") || "",
     status: formData.get("status") || "completed",
     category: formData.get("category") || "Freelance Income",
@@ -156,20 +208,38 @@ export async function updateTransactionAction(
     }
   }
 
+  const [profileResult, resolvedPlatformId] = await Promise.all([
+    supabase.from("profiles").select("default_currency").eq("id", user.id).single(),
+    resolveValidPlatformId(supabase, parsed.data.platformId),
+  ])
+
+  if (!resolvedPlatformId) {
+    return {
+      success: false,
+      error: "No active platform found in database.",
+    }
+  }
+
+  const baseCurrency = profileResult.data?.default_currency || "USD"
   const originalAmountDec = toDecimal(parsed.data.originalAmount)
-  const exchangeRateDec = toDecimal(parsed.data.exchangeRate || 1.0)
+  const exchangeRateNum = parsed.data.exchangeRate
+    ? toDecimal(parsed.data.exchangeRate).toNumber()
+    : (await getExchangeRate(parsed.data.originalCurrency, baseCurrency)).rate
+
+  const exchangeRateDec = toDecimal(exchangeRateNum)
   const convertedAmountDec = multiplyDecimals(originalAmountDec, exchangeRateDec)
 
   const { error } = await supabase
     .from("transactions")
     .update({
       client_id: parsed.data.clientId || null,
-      platform_id: parsed.data.platformId,
+      platform_id: resolvedPlatformId,
       reference_id: parsed.data.referenceId || null,
       original_amount: originalAmountDec.toNumber(),
       original_currency: parsed.data.originalCurrency,
       exchange_rate: exchangeRateDec.toNumber(),
       converted_amount: convertedAmountDec.toNumber(),
+      converted_currency: baseCurrency,
       payment_date: new Date(parsed.data.paymentDate).toISOString(),
       description: parsed.data.description,
       status: parsed.data.status,
@@ -189,6 +259,7 @@ export async function updateTransactionAction(
   revalidatePath("/transactions")
   revalidatePath("/dashboard")
   revalidatePath("/clients")
+  revalidatePath("/tax")
   return {
     success: true,
     message: "Transaction updated.",
@@ -231,9 +302,9 @@ export async function deleteTransactionAction(transactionId: string): Promise<Tr
   revalidatePath("/transactions")
   revalidatePath("/dashboard")
   revalidatePath("/clients")
+  revalidatePath("/tax")
   return {
     success: true,
     message: "Transaction removed from ledger.",
   }
 }
-

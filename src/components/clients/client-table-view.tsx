@@ -279,6 +279,7 @@ export function ClientTableView({
 
       {/* Client Add/Edit Modal */}
       <ClientDialog
+        key={dialogOpen ? (clientToEdit?.id ?? "new-client") : "closed-client"}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         clientToEdit={clientToEdit}

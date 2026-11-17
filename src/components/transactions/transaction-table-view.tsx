@@ -480,6 +480,7 @@ export function TransactionTableView({
 
       {/* Manual Entry Modal Dialog */}
       <ManualEntryDialog
+        key={dialogOpen ? (transactionToEdit?.id ?? "new-tx") : "closed-tx"}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         transactionToEdit={transactionToEdit}

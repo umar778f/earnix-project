@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useActionState } from "react"
+import { useRouter } from "next/navigation"
 import {
   Dialog,
   DialogContent,
@@ -15,7 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createClientAction, updateClientAction, type ClientActionResult } from "@/lib/clients/actions"
 import { type ClientListItem } from "@/lib/clients/service"
-import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react"
+import { AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Loader2 } from "lucide-react"
 
 interface ClientDialogProps {
   open: boolean
@@ -30,21 +31,29 @@ export function ClientDialog({
   clientToEdit,
   platforms,
 }: ClientDialogProps) {
+  const router = useRouter()
   const isEditing = !!clientToEdit
+
+  const hasExistingOptionalDetails = Boolean(
+    clientToEdit?.email || clientToEdit?.country || clientToEdit?.notes
+  )
+  const [showMore, setShowMore] = React.useState(hasExistingOptionalDetails)
+  const [email, setEmail] = React.useState(clientToEdit?.email || "")
+  const [country, setCountry] = React.useState(clientToEdit?.country || "")
+  const [notes, setNotes] = React.useState(clientToEdit?.notes || "")
 
   const [state, formAction, isPending] = useActionState<ClientActionResult | null, FormData>(
     async (prevState, formData) => {
-      let result: ClientActionResult
-      if (isEditing && clientToEdit) {
-        result = await updateClientAction(clientToEdit.id, prevState, formData)
-      } else {
-        result = await createClientAction(prevState, formData)
-      }
+      const result =
+        isEditing && clientToEdit
+          ? await updateClientAction(clientToEdit.id, prevState, formData)
+          : await createClientAction(prevState, formData)
 
       if (result.success) {
+        router.refresh()
         setTimeout(() => {
           onOpenChange(false)
-        }, 1200)
+        }, 450)
       }
       return result
     },
@@ -55,11 +64,11 @@ export function ClientDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEditing ? "Edit Client" : "Add New Client"}</DialogTitle>
+          <DialogTitle>{isEditing ? "Edit Client" : "Add Client"}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "Update client details and default billing platform."
-              : "Register an international client or platform contact in your directory."}
+              ? "Update client name or details."
+              : "Just enter a name to add a client. Extra details are optional."}
           </DialogDescription>
         </DialogHeader>
 
@@ -79,44 +88,20 @@ export function ClientDialog({
 
         <form action={formAction} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="name">Client / Company Name *</Label>
+            <Label htmlFor="name">Client Name *</Label>
             <Input
               id="name"
               name="name"
               defaultValue={clientToEdit?.name || ""}
-              placeholder="e.g. Global Tech Solutions"
+              placeholder="e.g. Acme Studio"
               required
+              autoFocus
               disabled={isPending}
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="country">Country</Label>
-              <Input
-                id="country"
-                name="country"
-                defaultValue={clientToEdit?.country || ""}
-                placeholder="e.g. United States"
-                disabled={isPending}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Billing Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                defaultValue={clientToEdit?.email || ""}
-                placeholder="billing@client.com"
-                disabled={isPending}
-              />
-            </div>
-          </div>
-
           <div className="space-y-1.5">
-            <Label htmlFor="defaultPlatformId">Primary Platform</Label>
+            <Label htmlFor="defaultPlatformId">Platform (Optional)</Label>
             <select
               id="defaultPlatformId"
               name="defaultPlatformId"
@@ -124,7 +109,7 @@ export function ClientDialog({
               disabled={isPending}
               className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
             >
-              <option value="">Select Platform Association</option>
+              <option value="">Direct / No Platform</option>
               {platforms.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -133,18 +118,65 @@ export function ClientDialog({
             </select>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="notes">Notes &amp; Contract Terms</Label>
-            <textarea
-              id="notes"
-              name="notes"
-              defaultValue={clientToEdit?.notes || ""}
-              rows={3}
-              placeholder="e.g. Milestone billing, weekly rate, NDA terms..."
-              disabled={isPending}
-              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 resize-none"
-            />
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowMore((prev) => !prev)}
+            className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          >
+            {showMore ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+            <span>{showMore ? "Hide optional details" : "Add optional details (email, country, notes)"}</span>
+          </button>
+
+          {showMore ? (
+            <div className="space-y-3 rounded-lg border border-border/70 bg-muted/20 p-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="country" className="text-xs">Country</Label>
+                  <Input
+                    id="country"
+                    name="country"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    placeholder="e.g. United States"
+                    disabled={isPending}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-xs">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="client@example.com"
+                    disabled={isPending}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="notes" className="text-xs">Notes</Label>
+                <textarea
+                  id="notes"
+                  name="notes"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={2}
+                  placeholder="Optional contract or billing notes..."
+                  disabled={isPending}
+                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 resize-none"
+                />
+              </div>
+            </div>
+          ) : (
+            <>
+              <input type="hidden" name="country" value={country} />
+              <input type="hidden" name="email" value={email} />
+              <input type="hidden" name="notes" value={notes} />
+            </>
+          )}
 
           <DialogFooter>
             <Button
@@ -158,7 +190,7 @@ export function ClientDialog({
             </Button>
             <Button type="submit" size="sm" disabled={isPending} className="cursor-pointer gap-1.5">
               {isPending && <Loader2 className="size-3.5 animate-spin" />}
-              <span>{isEditing ? "Save Changes" : "Create Client"}</span>
+              <span>{isEditing ? "Save Changes" : "Add Client"}</span>
             </Button>
           </DialogFooter>
         </form>
@@ -166,4 +198,3 @@ export function ClientDialog({
     </Dialog>
   )
 }
-

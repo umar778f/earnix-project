@@ -13,8 +13,10 @@ export const EXPENSE_CATEGORIES = [
 
 export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number]
 
+const PG_UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export const expenseFormSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().regex(PG_UUID_REGEX, "Invalid expense ID").optional(),
   title: z
     .string()
     .min(2, "Expense title must be at least 2 characters")
@@ -39,7 +41,7 @@ export const expenseFormSchema = z.object({
   isTaxDeductible: z.boolean().default(true),
   taxCategory: z.string().optional(),
   expenseDate: z.string().min(10, "Please provide a valid date (YYYY-MM-DD)"),
-  documentId: z.string().uuid().optional().nullable(),
+  documentId: z.string().regex(PG_UUID_REGEX, "Invalid document ID").optional().nullable(),
   notes: z.string().max(1000).optional(),
 })
 

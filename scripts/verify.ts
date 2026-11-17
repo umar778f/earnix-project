@@ -18,6 +18,7 @@ import { parseUpworkCsv, SAMPLE_UPWORK_CSV } from "../src/lib/parsers/upwork"
 import { parseGenericCsv, SAMPLE_GENERIC_CSV } from "../src/lib/parsers/generic"
 import { classifyIncomeTransaction, classifyExpenseRecord } from "../src/lib/ai/categorizer"
 import { transactionSchema } from "../src/lib/transactions/schemas"
+import { clientSchema } from "../src/lib/clients/schemas"
 import { expenseFormSchema } from "../src/lib/expenses/schemas"
 import { documentUploadSchema } from "../src/lib/documents/schemas"
 
@@ -259,6 +260,28 @@ const invalidCurrencyTx = transactionSchema.safeParse({
   category: "Freelance Income",
 })
 assert(!invalidCurrencyTx.success, "Transaction schema rejects invalid currency format")
+
+// Test: Seeded Postgres platform UUIDs accepted by clientSchema & transactionSchema (Zod v4 regression)
+const seededPlatformClient = clientSchema.safeParse({
+  name: "Acme Studio",
+  defaultPlatformId: "00000000-0000-0000-0000-000000000001",
+})
+const malformedPlatformClient = clientSchema.safeParse({
+  name: "Acme Studio",
+  defaultPlatformId: "not-a-valid-uuid",
+})
+const seededPlatformTx = transactionSchema.safeParse({
+  platformId: "00000000-0000-0000-0000-000000000001",
+  clientId: "",
+  originalAmount: "250.00",
+  originalCurrency: "USD",
+  paymentDate: "2026-11-17",
+  description: "Logo design",
+})
+assert(
+  seededPlatformClient.success && !malformedPlatformClient.success && seededPlatformTx.success,
+  "Client & transaction schemas accept seeded Postgres UUIDs (00000000-...) and reject malformed IDs"
+)
 
 // Test: Expense schema rejects unsupported currency
 const invalidExpenseCurrency = expenseFormSchema.safeParse({
